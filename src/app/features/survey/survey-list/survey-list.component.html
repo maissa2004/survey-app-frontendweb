@@ -1,0 +1,54 @@
+<div class="container mt-4">
+  
+  <!--bloc debogage -->
+  <div class="alert alert-info">
+    <strong>Debug:</strong> 
+    Loading = {{ loading }} | 
+    Surveys count = {{ surveys.length }} | 
+    Error = {{ error }}
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Liste des Surveys</h2>
+    <a routerLink="/surveys/new" class="btn btn-primary">
+      + Nouveau Survey
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Libellé</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let survey of surveys">
+              <td>{{ survey.id }}</td>
+              <td>{{ survey.code }}</td>
+              <td>{{ survey.libelle }}</td>
+              <td>
+                <a [routerLink]="['/surveys/edit', survey.id]" class="btn btn-sm btn-warning me-2">
+                  Modifier
+                </a>
+                <button class="btn btn-sm btn-danger" (click)="deleteSurvey(survey.id)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="surveys.length === 0">
+              <td colspan="4" class="text-center text-muted">
+                Aucun survey trouvé
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="card mb-3">
+  <div class="card-header bg-warning">
+    <h4 class="mb-0">Nouvelle Question</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Code *</label>
+          <input type="text" class="form-control" formControlName="code">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Titre FR *</label>
+          <input type="text" class="form-control" formControlName="titleFr">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Titre EN</label>
+          <input type="text" class="form-control" formControlName="titleEn">
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Type *</label>
+          <select class="form-control" formControlName="codeTypeQues">
+            <option value="">Sélectionner</option>
+            <option *ngFor="let type of questionTypes" [value]="type.code">
+              {{ type.libelle }}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" formControlName="required">
+            <label class="form-check-label">Obligatoire</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" formControlName="conditionnel">
+            <label class="form-check-label">Question conditionnelle</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <h5>Réponses</h5>
+        <div class="alert alert-info" *ngIf="requiresAnswers && answersList.length === 0">
+          Ce type de question nécessite des réponses prédéfinies.
+        </div>
+        
+        <div *ngIf="answersList.length > 0">
+          <div *ngFor="let answer of answersList; let i = index" class="border p-2 mb-2">
+            <div class="d-flex justify-content-between">
+              <span>{{ answer.libelle }}</span>
+              <button type="button" class="btn btn-danger btn-sm" (click)="onAnswerDeleted(answer.id!)">
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3" 
+              [disabled]="questionForm.invalid || (requiresAnswers && answersList.length === 0)">
+        Ajouter la question
+      </button>
+    </form>
+  </div>
+</div>

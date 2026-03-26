@@ -1,0 +1,38 @@
+<div class="card mb-3">
+  <div class="card-header bg-info text-white">
+    <h4 class="mb-0">Nouvelle Section</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="sectionForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Code *</label>
+          <input type="text" class="form-control" formControlName="code">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Titre FR *</label>
+          <input type="text" class="form-control" formControlName="title">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Titre EN</label>
+          <input type="text" class="form-control" formControlName="titleEn">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="conditionnel" formControlName="conditionnel">
+            <label class="form-check-label" for="conditionnel">Section conditionnelle</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Ordre</label>
+          <input type="number" class="form-control" formControlName="ordre">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="sectionForm.invalid">
+        Ajouter la section
+      </button>
+    </form>
+  </div>
+</div>

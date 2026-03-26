@@ -1,0 +1,80 @@
+<div class="card mb-3">
+  <div class="card-header bg-success text-white">
+    <h4 class="mb-0">{{ isEditing ? 'Modifier' : 'Ajouter' }} une réponse</h4>
+  </div>
+  <div class="card-body">
+    <form [formGroup]="answerForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Code</label>
+          <input type="text" class="form-control" formControlName="code">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Libellé FR *</label>
+          <input type="text" 
+                 class="form-control" 
+                 [class.is-invalid]="answerForm.get('libelle')?.invalid && answerForm.get('libelle')?.touched"
+                 formControlName="libelle">
+          <div class="invalid-feedback" *ngIf="answerForm.get('libelle')?.invalid && answerForm.get('libelle')?.touched">
+            Le libellé est requis
+          </div>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Libellé EN</label>
+          <input type="text" class="form-control" formControlName="libelleEn">
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Référence</label>
+          <input type="text" class="form-control" formControlName="reference">
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="answerForm.invalid">
+          {{ isEditing ? 'Mettre à jour' : 'Ajouter' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" *ngIf="isEditing">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Liste des réponses existantes -->
+<div class="card mt-3" *ngIf="existingAnswers.length > 0">
+  <div class="card-header">
+    <h5 class="mb-0">Réponses existantes ({{ existingAnswers.length }})</h5>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Libellé FR</th>
+            <th>Libellé EN</th>
+            <th>Référence</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let answer of existingAnswers">
+            <td>{{ answer.code || '-' }}</td>
+            <td>{{ answer.libelle }}</td>
+            <td>{{ answer.libelleEn || '-' }}</td>
+            <td>{{ answer.reference || '-' }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2" (click)="onEditAnswer(answer)">
+                Modifier
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="onDeleteAnswer(answer.id!)">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
