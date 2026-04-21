@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { EtatSurvey } from '../../../core/models';
 
 @Component({
   selector: 'app-survey-form',
@@ -17,6 +18,9 @@ export class SurveyFormComponent implements OnInit {
   surveyId: number | null = null;
   loading = false;
   error: string | null = null;
+  etatsSurvey: EtatSurvey[] = [];  
+  selectedEtatId: number = 1;  
+
 
   constructor(
     private fb: FormBuilder,
@@ -29,6 +33,7 @@ export class SurveyFormComponent implements OnInit {
       libelle: ['', [Validators.required]],
       libelleEn: [''],
       isValid: [true],
+      idEtatSurvey: [1, Validators.required],
       isFormReference: [false]
     });
   }
@@ -54,7 +59,7 @@ export class SurveyFormComponent implements OnInit {
           code: data.code,
           libelle: data.libelle,
           libelleEn: data.libelleEn || '',
-          isValid: data.valid,
+          idEtatSurvey: data.idEtatSurvey || 1,
           isFormReference: data.formReference
         });
         this.loading = false;
@@ -77,11 +82,11 @@ export class SurveyFormComponent implements OnInit {
       code: this.surveyForm.value.code,
       libelle: this.surveyForm.value.libelle,
       libelleEn: this.surveyForm.value.libelleEn,
-      isValid: this.surveyForm.value.isValid,
-      isFormReference: this.surveyForm.value.isFormReference
-    };
+      isFormReference: this.surveyForm.value.isFormReference,
+      idEtatSurvey: Number(this.surveyForm.value.idEtatSurvey)  // 1 ou 2
+     };
 
-    console.log('Données du survey:', surveyData);
+console.log('📤 Envoi survey (DÉTAIL):', JSON.stringify(surveyData, null, 2));
 
     if (this.isEditMode && this.surveyId) {
       // Mise à jour

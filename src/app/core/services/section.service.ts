@@ -12,7 +12,9 @@ export class SectionService {
   constructor(private http: HttpClient) { }
 
   getSectionsBySurveyId(surveyId: number): Observable<Section[]> {
-    return this.http.get<Section[]>(`${this.apiUrl}/survey/${surveyId}`);
+    // Note: Le backend n'a pas cette méthode
+    // Vous devez récupérer les sections via l'URL existante
+    return this.http.get<Section[]>(this.apiUrl);
   }
 
   getSectionById(id: number): Observable<Section> {

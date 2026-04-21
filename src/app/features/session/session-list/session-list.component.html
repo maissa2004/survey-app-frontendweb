@@ -1,0 +1,369 @@
+<div class="container-fluid px-4 py-3">
+  <!-- En-tête avec effet glassmorphism -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="header-glass animate-fade-in">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+          <div>
+            <div class="d-flex align-items-center gap-3 mb-2 mb-md-0">
+              <div class="header-icon">
+                <i class="bi bi-calendar-event-fill"></i>
+              </div>
+              <div>
+                <h1 class="display-5 fw-bold text-navy mb-0">Gestion des Sessions</h1>
+                <p class="text-muted mt-2 mb-0">
+                  <i class="bi bi-info-circle-fill me-1 text-orange"></i>
+                  Organisez et planifiez vos campagnes d'enquête
+                </p>
+              </div>
+            </div>
+          </div>
+          <a routerLink="/sessions/new" class="btn btn-gradient animate-scale">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nouvelle session
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cartes statistiques -->
+  <div class="row g-4 mb-4 animate-fade-in-up" *ngIf="!loading && sessions.length > 0">
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-total">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-collection"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total sessions</span>
+          <h2 class="stat-value">{{ sessions.length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-active">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-play-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Actives</span>
+          <h2 class="stat-value">{{ getSessionsByStatus('active').length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-planned">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-calendar-check-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Planifiées</span>
+          <h2 class="stat-value">{{ getSessionsByStatus('planifiee').length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-ended">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Terminées</span>
+          <h2 class="stat-value">{{ getSessionsByStatus('terminee').length }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 SECTION FILTRES AVEC BOUTON RECHERCHE ICÔNE -->
+<div class="filters-card animate-fade-in-up" *ngIf="!loading && sessions.length > 0">
+  <div class="filters-header">
+    <i class="bi bi-funnel-fill me-2"></i>
+    <strong>Filtres</strong>
+    <button class="btn-reset" (click)="resetFilters()" *ngIf="hasActiveFilters()">
+      <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
+    </button>
+  </div>
+  <div class="filters-body">
+    <div class="filter-group">
+      <div class="filter-input">
+        <i class="bi bi-search"></i>
+        <input type="text" 
+               [(ngModel)]="tempSearchTerm" 
+               (keyup.enter)="search()"
+               placeholder="Rechercher par intitulé, ID, survey..."
+               class="filter-search">
+      </div>
+    </div>
+    
+    <div class="filter-group">
+      <div class="filter-select">
+        <i class="bi bi-flag"></i>
+        <select [(ngModel)]="tempFilterStatus">
+          <option value="all">Tous les statuts</option>
+          <option value="active">▶️ Actives</option>
+          <option value="planifiee">📅 Planifiées</option>
+          <option value="inactive">⏸️ Inactives</option>
+          <option value="terminee">✅ Terminées</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="filter-group">
+      <div class="filter-date">
+        <i class="bi bi-calendar-range"></i>
+        <input type="date" 
+               [(ngModel)]="tempFilterDateFrom" 
+               class="date-input"
+               placeholder="Date début">
+        <span class="date-sep">à</span>
+        <input type="date" 
+               [(ngModel)]="tempFilterDateTo" 
+               class="date-input"
+               placeholder="Date fin">
+      </div>
+    </div>
+    
+    <!-- 🔥 BOUTON ICÔNE SEULEMENT -->
+    <div class="filter-button">
+      <button class="btn-search" (click)="search()" title="Rechercher">
+        <i class="bi bi-search"></i>
+        <span>Rechercher</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Affichage des filtres actifs -->
+  <div class="filters-footer" *ngIf="hasActiveFilters()">
+    <i class="bi bi-info-circle me-1"></i>
+    {{ getFilteredCount() }} résultat(s) sur {{ sessions.length }} session(s)
+    <span class="active-filters">
+      <span *ngIf="activeSearchTerm" class="filter-tag">
+        <i class="bi bi-search me-1"></i> {{ activeSearchTerm }}
+      </span>
+      <span *ngIf="activeFilterStatus !== 'all'" class="filter-tag">
+        <i class="bi bi-flag me-1"></i> {{ getStatusLabel(activeFilterStatus) }}
+      </span>
+      <span *ngIf="activeFilterDateFrom" class="filter-tag">
+        <i class="bi bi-calendar me-1"></i> Du {{ activeFilterDateFrom | date:'dd/MM/yyyy' }}
+      </span>
+      <span *ngIf="activeFilterDateTo" class="filter-tag">
+        <i class="bi bi-calendar me-1"></i> Au {{ activeFilterDateTo | date:'dd/MM/yyyy' }}
+      </span>
+    </span>
+  </div>
+</div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container animate-fade-in">
+    <div class="spinner-grow text-orange" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement des sessions en cours...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error && !loading" class="alert-glass alert-danger-glass animate-fade-in">
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+      <div>
+        <strong>Une erreur est survenue</strong><br>
+        {{ error }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions list avec filtrage -->
+  <div *ngIf="!loading && !error && filteredSessions.length > 0" class="animate-fade-in-up">
+    <div class="sessions-grid">
+      <div *ngFor="let session of filteredSessions; let i = index" 
+           class="session-card animate-slide-in" 
+           [style.animation-delay]="i * 0.05 + 's'">
+        
+        <!-- Card header -->
+        <div class="session-card-header" [ngClass]="{
+          'header-active': session.status === 'active',
+          'header-planned': session.status === 'planifiee',
+          'header-inactive': session.status === 'inactive',
+          'header-ended': session.status === 'terminee'
+        }">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <span class="session-id">#{{ session.id }}</span>
+              <span class="session-status-badge" [ngClass]="{
+                'status-active': session.status === 'active',
+                'status-planned': session.status === 'planifiee',
+                'status-inactive': session.status === 'inactive',
+                'status-ended': session.status === 'terminee'
+              }">
+                <i class="bi" [ngClass]="{
+                  'bi-play-circle-fill': session.status === 'active',
+                  'bi-calendar-check-fill': session.status === 'planifiee',
+                  'bi-pause-circle-fill': session.status === 'inactive',
+                  'bi-check-circle-fill': session.status === 'terminee'
+                }"></i>
+                {{ getStatusLabel(session.status) }}
+              </span>
+            </div>
+            <div class="session-actions">
+              <button class="action-icon" (click)="activateSession(session.id)" *ngIf="session.status !== 'active'" title="Activer">
+                <i class="bi bi-play-fill"></i>
+              </button>
+              <button class="action-icon" (click)="deactivateSession(session.id)" *ngIf="session.status === 'active'" title="Désactiver">
+                <i class="bi bi-pause-fill"></i>
+              </button>
+              <a [routerLink]="['/sessions/edit', session.id]" class="action-icon" title="Modifier">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button class="action-icon text-danger" (click)="deleteSession(session.id)" title="Supprimer">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card body -->
+        <div class="session-card-body">
+          <h3 class="session-title">{{ session.intitule }}</h3>
+          
+          <div class="session-info-grid">
+            <div class="info-item">
+              <i class="bi bi-calendar-range text-orange"></i>
+              <div>
+                <small class="text-muted">Début</small>
+                <div class="fw-semibold">{{ session.dateDebut | date:'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-calendar-x text-orange"></i>
+              <div>
+                <small class="text-muted">Fin</small>
+                <div class="fw-semibold">{{ session.dateFin | date:'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Surveys section -->
+          <div class="surveys-section">
+            <div class="section-title">
+              <i class="bi bi-file-earmark-text"></i>
+              <span>Formulaires associés</span>
+            </div>
+            <div class="surveys-list">
+              <div *ngFor="let survey of session.surveys" class="survey-item">
+                <div class="survey-header">
+                  <div class="survey-info">
+                    <span class="survey-code">{{ survey.code }}</span>
+                    <span class="survey-libelle">{{ survey.libelle }}</span>
+                  </div>
+                  <button class="btn-add-enqueteur" 
+                          (click)="openEnqueteurModal(survey.sessionSurveyId, survey.code + ' - ' + survey.libelle)"
+                          title="Affecter un enquêteur">
+                    <i class="bi bi-person-plus"></i>
+                  </button>
+                </div>
+                
+                <!-- Enquêteurs -->
+                <div class="enqueteurs-list" *ngIf="survey.enqueteurs && survey.enqueteurs.length > 0">
+                  <div class="enqueteur-tag" *ngFor="let enqueteur of survey.enqueteurs">
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ enqueteur.username }}</span>
+                    <i class="bi bi-x-circle-fill remove-icon" 
+                       (click)="removeEnqueteur(survey.sessionSurveyId, enqueteur.idUser, $event)"></i>
+                  </div>
+                </div>
+                <div class="no-enqueteurs" *ngIf="!survey.enqueteurs || survey.enqueteurs.length === 0">
+                  <i class="bi bi-people"></i>
+                  <span>Aucun enquêteur affecté</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer info -->
+    <div class="footer-info">
+      <i class="bi bi-info-circle me-1 text-orange"></i>
+      {{ getFilteredCount() }} session(s) affichée(s) sur {{ sessions.length }} total • Dernière mise à jour: {{ lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }}
+    </div>
+  </div>
+
+  <!-- Message si aucun résultat après filtrage -->
+  <div *ngIf="!loading && !error && sessions.length > 0 && filteredSessions.length === 0" class="empty-filter animate-fade-in">
+    <div class="empty-filter-icon">
+      <i class="bi bi-search"></i>
+    </div>
+    <h4>Aucun résultat trouvé</h4>
+    <p>Aucune session ne correspond à vos critères de recherche</p>
+    <button class="btn btn-gradient" (click)="resetFilters()">
+      <i class="bi bi-arrow-counterclockwise me-2"></i>
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && sessions.length === 0" class="empty-state animate-fade-in">
+    <div class="empty-state-icon">
+      <i class="bi bi-inbox"></i>
+    </div>
+    <h4>Aucune session trouvée</h4>
+    <p>Commencez par créer votre première session d'enquête</p>
+    <a routerLink="/sessions/new" class="btn btn-gradient">
+      <i class="bi bi-plus-circle me-2"></i>
+      Créer la première session
+    </a>
+  </div>
+</div>
+
+<!-- Modal d'affectation d'enquêteur -->
+<div class="modal fade modal-glass" [class.show]="showEnqueteurModal" 
+     [style.display]="showEnqueteurModal ? 'block' : 'none'" 
+     style="background-color: rgba(0,0,0,0.5)" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0">
+      <div class="modal-header bg-gradient-modal text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-person-plus me-2"></i>
+          Affecter un enquêteur
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeEnqueteurModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">
+          <i class="bi bi-file-earmark-text me-1 text-orange"></i>
+          Survey: <strong>{{ selectedSurveyName }}</strong>
+        </p>
+        
+        <div *ngIf="availableEnqueteurs.length === 0" class="alert-glass alert-info-glass">
+          <i class="bi bi-info-circle me-2"></i>
+          Aucun enquêteur disponible
+        </div>
+        
+        <div class="enqueteur-list-modal">
+          <div *ngFor="let user of availableEnqueteurs" 
+               class="enqueteur-item-modal"
+               (click)="assignEnqueteur(user.id)">
+            <div class="enqueteur-avatar">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="enqueteur-info">
+              <div class="fw-semibold">{{ user.username }}</div>
+              <div class="small text-muted">
+                <span *ngIf="user.email"><i class="bi bi-envelope me-1"></i>{{ user.email }}</span>
+                <span *ngIf="user.phone" class="ms-2"><i class="bi bi-phone me-1"></i>{{ user.phone }}</span>
+              </div>
+            </div>
+            <i class="bi bi-plus-circle-fill text-success"></i>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeEnqueteurModal()">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

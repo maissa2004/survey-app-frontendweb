@@ -1,0 +1,31 @@
+/* src/app/features/auth/login/login.component.css */
+.bg-navy {
+  background-color: #001f3f !important;
+}
+
+.btn-orange {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+  color: white;
+  transition: all 0.2s;
+}
+
+.btn-orange:hover {
+  background-color: #e55a2b;
+  border-color: #e55a2b;
+  transform: translateY(-1px);
+}
+
+.text-orange {
+  color: #ff6b35 !important;
+}
+
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.form-control:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}

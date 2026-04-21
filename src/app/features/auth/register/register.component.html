@@ -1,0 +1,116 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-navy text-white text-center border-0 rounded-top">
+          <h3 class="mb-0">
+            <i class="bi bi-person-plus-fill me-2"></i>
+            Inscription
+          </h3>
+        </div>
+        <div class="card-body p-4">
+          <div *ngIf="error" class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ error }}
+          </div>
+          
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-person me-1 text-orange"></i>
+                Nom d'utilisateur <span class="text-danger">*</span>
+              </label>
+              <input type="text" 
+                     class="form-control" 
+                     [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+                     formControlName="username"
+                     placeholder="Ex: jean.dupont">
+              <div class="invalid-feedback" *ngIf="registerForm.get('username')?.errors?.['required']">
+                Le nom d'utilisateur est requis
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('username')?.errors?.['minlength']">
+                Minimum 3 caractères
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-envelope me-1 text-orange"></i>
+                Email
+              </label>
+              <input type="email" 
+                     class="form-control" 
+                     [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+                     formControlName="email"
+                     placeholder="Ex: jean@example.com">
+              <div class="invalid-feedback" *ngIf="registerForm.get('email')?.errors?.['email']">
+                Email invalide
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-phone me-1 text-orange"></i>
+                Téléphone
+              </label>
+              <input type="tel" 
+                     class="form-control" 
+                     [class.is-invalid]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
+                     formControlName="phone"
+                     placeholder="Ex: 0612345678">
+              <div class="invalid-feedback" *ngIf="registerForm.get('phone')?.errors?.['pattern']">
+                Numéro à 10 chiffres
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-lock me-1 text-orange"></i>
+                Mot de passe <span class="text-danger">*</span>
+              </label>
+              <input type="password" 
+                     class="form-control"
+                     [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+                     formControlName="password"
+                     placeholder="Minimum 6 caractères">
+              <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['required']">
+                Le mot de passe est requis
+              </div>
+              <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['minlength']">
+                Minimum 6 caractères
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-lock-fill me-1 text-orange"></i>
+                Confirmer le mot de passe <span class="text-danger">*</span>
+              </label>
+              <input type="password" 
+                     class="form-control"
+                     [class.is-invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched"
+                     formControlName="confirmPassword"
+                     placeholder="Répéter le mot de passe">
+              <div class="invalid-feedback" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+                Les mots de passe ne correspondent pas
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-orange w-100 py-2" [disabled]="registerForm.invalid || loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <i class="bi bi-person-plus-fill me-2" *ngIf="!loading"></i>
+              S'inscrire
+            </button>
+          </form>
+          
+          <div class="text-center mt-3">
+            <small class="text-muted">
+              Déjà un compte ? 
+              <a routerLink="/login" class="text-orange text-decoration-none">Se connecter</a>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

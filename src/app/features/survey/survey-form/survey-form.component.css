@@ -1,0 +1,114 @@
+/* Couleurs principales */
+.bg-navy {
+  background-color: #001f3f !important;
+}
+
+.text-navy {
+  color: #001f3f !important;
+}
+
+/* Orange */
+.bg-orange {
+  background-color: #ff6b35 !important;
+}
+
+.text-orange {
+  color: #ff6b35 !important;
+}
+
+.btn-orange {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+  color: white;
+  transition: all 0.2s;
+}
+
+.btn-orange:hover {
+  background-color: #e55a2b;
+  border-color: #e55a2b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  color: white;
+}
+
+.btn-outline-navy {
+  border-color: #001f3f;
+  color: #001f3f;
+  transition: all 0.2s;
+}
+
+.btn-outline-navy:hover {
+  background-color: #001f3f;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Alert */
+.alert-orange {
+  background-color: #fff3e8;
+  border-color: #ff6b35;
+  color: #001f3f;
+  border-left: 4px solid #ff6b35;
+}
+
+/* Card */
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Form controls */
+.form-control {
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .card-header h3 {
+    font-size: 1.25rem;
+  }
+  
+  .btn {
+    padding: 0.375rem 0.75rem;
+  }
+}

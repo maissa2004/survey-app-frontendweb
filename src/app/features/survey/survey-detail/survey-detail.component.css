@@ -1,0 +1,160 @@
+/* Couleurs principales */
+.bg-navy {
+  background-color: #001f3f !important;
+}
+
+.bg-navy-light {
+  background-color: #e8f0fe !important;
+}
+
+.text-navy {
+  color: #001f3f !important;
+}
+
+.btn-navy {
+  background-color: #001f3f;
+  border-color: #001f3f;
+  color: white;
+}
+
+.btn-navy:hover {
+  background-color: #002a5c;
+  border-color: #002a5c;
+  color: white;
+}
+
+.btn-outline-navy {
+  border-color: #001f3f;
+  color: #001f3f;
+}
+
+.btn-outline-navy:hover {
+  background-color: #001f3f;
+  color: white;
+}
+
+/* Orange */
+.bg-orange {
+  background-color: #f45b23 !important;
+}
+
+.bg-orange-light {
+  background-color: #fff3e8 !important;
+}
+
+.text-orange {
+  color: #f45b23 !important;
+}
+
+.btn-orange {
+  background-color: #f45b23;
+  border-color: #f45b23;
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: #ca542c;
+  border-color: #ca542c;
+  color: white;
+}
+
+.btn-outline-orange {
+  border-color: #f45b23;
+  color: #f45b23;
+}
+
+.btn-outline-orange:hover {
+  background-color: #f45b23;
+  color: white;
+}
+
+.alert-orange {
+  background-color: #fff3e8;
+  border-color: #f45b23;
+  color: #001f3f;
+}
+
+.alert-orange-light {
+  background-color: #fff3e8;
+  color: #001f3f;
+}
+
+.border-orange {
+  border-color: #f45b23 !important;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Cards */
+.card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 0.75rem;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* Badges */
+.badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+  border-radius: 0.5rem;
+}
+
+/* Modal */
+.modal-content {
+  border-radius: 1rem;
+}
+
+.modal-header {
+  border-radius: 1rem 1rem 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .card-header h4, .card-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Spinner */
+.spinner-border.text-orange {
+  color: #f45b23 !important;
+}

@@ -1,0 +1,21 @@
+/* src/app/core/components/header/header.component.css */
+.bg-navy {
+  background-color: #001f3f !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #ff6b35 !important;
+}
+
+.text-orange {
+  color: #ff6b35 !important;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}

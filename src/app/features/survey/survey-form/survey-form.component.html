@@ -1,66 +1,94 @@
 <div class="container mt-4">
-   <!-- Message de chargement -->
-  <div *ngIf="loading" class="alert alert-info text-center">
-    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-    Chargement...
+  <!-- Message de chargement -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center py-5 bg-white rounded-3 shadow-sm">
+    <div class="spinner-border text-orange me-2" role="status"></div>
+    <span>Chargement...</span>
   </div>
-  <div class="card">
-    <div class="card-header bg-primary text-white">
-      <h3 class="mb-0">{{ isEditMode ? 'Modifier' : 'Créer' }} un Survey</h3>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="alert alert-orange shadow-sm border-0">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+  </div>
+
+  <!-- Formulaire -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-navy text-white d-flex align-items-center border-0 rounded-top">
+      <i class="bi" [class.bi-pencil-square]="isEditMode" [class.bi-plus-circle]="!isEditMode" style="font-size: 1.5rem;"></i>
+      <h3 class="mb-0 ms-2">{{ isEditMode ? 'Modifier' : 'Créer' }} un Survey</h3>
     </div>
-    <div class="card-body">
+    <div class="card-body bg-white">
       <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Code *</label>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              Code <span class="text-orange">*</span>
+            </label>
             <input type="text" 
                    class="form-control" 
                    [class.is-invalid]="surveyForm.get('code')?.invalid && surveyForm.get('code')?.touched"
-                   formControlName="code">
+                   formControlName="code"
+                   placeholder="Ex: SURV_001">
             <div class="invalid-feedback" *ngIf="surveyForm.get('code')?.invalid && surveyForm.get('code')?.touched">
               Le code est requis
             </div>
           </div>
           
-          <div class="col-md-6 mb-3">
-            <label class="form-label">Libellé FR *</label>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              Libellé FR <span class="text-orange">*</span>
+            </label>
             <input type="text" 
                    class="form-control"
                    [class.is-invalid]="surveyForm.get('libelle')?.invalid && surveyForm.get('libelle')?.touched"
-                   formControlName="libelle">
+                   formControlName="libelle"
+                   placeholder="Ex: Enquête de satisfaction">
             <div class="invalid-feedback" *ngIf="surveyForm.get('libelle')?.invalid && surveyForm.get('libelle')?.touched">
               Le libellé est requis
             </div>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Libellé EN</label>
-            <input type="text" class="form-control" formControlName="libelleEn">
+        <div class="row mt-3">
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-translate me-1 text-orange"></i>Libellé EN
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   formControlName="libelleEn"
+                   placeholder="Ex: Satisfaction survey">
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="isValid" formControlName="isValid">
-              <label class="form-check-label" for="isValid">Actif</label>
-            </div>
+        <!-- 🔥 SECTION STATUT MODIFIÉE -->
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-flag me-1 text-orange"></i>
+              Statut <span class="text-orange">*</span>
+            </label>
+            <select class="form-select" formControlName="idEtatSurvey">
+              <option [value]="1">✅ Actif</option>
+              <option [value]="2">⭕ Inactif</option>
+            </select>
           </div>
-          <div class="col-md-6 mb-3">
-            <div class="form-check">
+          <div class="col-md-6">
+            <div class="form-check mt-4">
               <input type="checkbox" class="form-check-input" id="isFormReference" formControlName="isFormReference">
-              <label class="form-check-label" for="isFormReference">Formulaire de référence</label>
+              <label class="form-check-label" for="isFormReference">
+                <i class="bi bi-star-fill text-orange me-1"></i>
+                Formulaire de référence
+              </label>
             </div>
           </div>
         </div>
 
-        <div class="d-flex justify-content-end mt-3">
-          <a routerLink="/surveys" class="btn btn-secondary me-2">
-            Annuler
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+          <a routerLink="/surveys" class="btn btn-outline-navy">
+            <i class="bi bi-arrow-left me-1"></i> Annuler
           </a>
-          <button type="submit" class="btn btn-primary" [disabled]="surveyForm.invalid">
+          <button type="submit" class="btn btn-orange" [disabled]="surveyForm.invalid">
+            <i class="bi" [class.bi-check-lg]="isEditMode" [class.bi-plus-lg]="!isEditMode"></i>
             {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
           </button>
         </div>

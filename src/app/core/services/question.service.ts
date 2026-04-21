@@ -8,7 +8,7 @@ import { Question, NmTypeQuest } from '../models/survey';
 })
 export class QuestionService {
   private apiUrl = '/api/question';
-  private typeUrl = '/api/nm-type-quest';
+  private typeUrl = '/api/nmTypeQuest';  // ✅ Modifier ici : camelCase
 
   constructor(private http: HttpClient) { }
 
@@ -21,7 +21,7 @@ export class QuestionService {
   }
 
   getQuestionTypes(): Observable<NmTypeQuest[]> {
-    return this.http.get<NmTypeQuest[]>(this.typeUrl);
+    return this.http.get<NmTypeQuest[]>(this.typeUrl);  // Maintenant /api/nmTypeQuest
   }
 
   createQuestion(question: Question): Observable<Question> {

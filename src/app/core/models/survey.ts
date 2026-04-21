@@ -8,6 +8,15 @@ export interface NmTypeQuest {
   dtUpdate?: Date;
 }
 
+export interface EtatSurvey {
+  id: number;
+  libelle: string;
+  libelleEn?: string;
+  etat: boolean;  
+  dtUpdate?: Date;
+}
+
+
 export interface NmAnswers {
   id: number;
   code: string;
@@ -30,18 +39,17 @@ export interface Answer {
 
 export interface Question {
   id?: number;
-  idSectionQues?: number;
   code: string;
   titleFr: string;
   titleEn?: string;
-  required: boolean;
-  conditionnel: boolean;
-  codeTypeQues?: string;
-  libelleNmtype?: string;
-  libelleEnNmtype?: string;
-  hasConditions?: boolean;
-  answers?: Answer[];
+  reference?: string;
+  descriptionFr?: string;
+  description?: string;
+  id_nm_type_quest: number;
   parentAnswerId?: number;
+  answers?: Answer[];
+  required: boolean;
+  conditionnel: boolean | number;
 }
 
 export interface Section {
@@ -49,12 +57,13 @@ export interface Section {
   code: string;
   title: string;
   titleEn?: string;
-  conditionnel: boolean;
+  conditionnel: boolean | number;  
   ordre: number;
   idSurvey?: number;
   dtUpdate?: Date;
   questions?: Question[];
   parentAnswerId?: number;
+  children?: Section[];  // ← Seulement pour l'affichage frontend, pas dans la base
 }
 
 export interface Survey {
@@ -67,4 +76,6 @@ export interface Survey {
   isValid?: boolean;
   isFormReference?: boolean;
   sections?: Section[];
+  idEtatSurvey?: number;     
+  estActif?: boolean;  // ← Calculé à partir de idEtatSurvey, pas stocké en base
 }

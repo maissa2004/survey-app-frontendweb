@@ -1,0 +1,127 @@
+<!-- src/app/features/session/session-form/session-form.component.html -->
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-navy text-white">
+      <h3 class="mb-0">
+        <i class="bi" [class.bi-pencil-square]="isEditMode" [class.bi-calendar-plus]="!isEditMode"></i>
+        {{ isEditMode ? 'Modifier' : 'Nouvelle' }} Session
+      </h3>
+    </div>
+    <div class="card-body bg-white">
+      
+      <!-- Message de succès -->
+      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+
+      <!-- Message d'erreur -->
+      <div *ngIf="error" class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+      </div>
+
+      <!-- Formulaire -->
+      <form [formGroup]="sessionForm" (ngSubmit)="onSubmit()">
+        <div class="row g-3">
+          <!-- Intitulé -->
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              Intitulé <span class="text-orange">*</span>
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   [class.is-invalid]="sessionForm.get('intitule')?.invalid && sessionForm.get('intitule')?.touched"
+                   formControlName="intitule"
+                   placeholder="Ex: Enquête satisfaction Q1 2026">
+            <div class="invalid-feedback" *ngIf="sessionForm.get('intitule')?.invalid && sessionForm.get('intitule')?.touched">
+              L'intitulé est requis
+            </div>
+          </div>
+
+          <!-- Date début -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              Date de début <span class="text-orange">*</span>
+            </label>
+            <input type="datetime-local" 
+                   class="form-control" 
+                   [class.is-invalid]="sessionForm.get('dateDebut')?.invalid && sessionForm.get('dateDebut')?.touched"
+                   formControlName="dateDebut">
+            <div class="invalid-feedback" *ngIf="sessionForm.get('dateDebut')?.invalid && sessionForm.get('dateDebut')?.touched">
+              La date de début est requise
+            </div>
+          </div>
+
+          <!-- Date fin -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              Date de fin <span class="text-orange">*</span>
+            </label>
+            <input type="datetime-local" 
+                   class="form-control" 
+                   [class.is-invalid]="sessionForm.get('dateFin')?.invalid && sessionForm.get('dateFin')?.touched"
+                   formControlName="dateFin">
+            <div class="invalid-feedback" *ngIf="sessionForm.get('dateFin')?.invalid && sessionForm.get('dateFin')?.touched">
+              La date de fin est requise
+            </div>
+          </div>
+
+          <!-- Statut -->
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-flag me-1 text-orange"></i>
+              Statut <span class="text-orange">*</span>
+            </label>
+            <select class="form-select" 
+                    [class.is-invalid]="sessionForm.get('status')?.invalid && sessionForm.get('status')?.touched"
+                    formControlName="status">
+              <option value="planifiee">📅 Planifiée</option>
+              <option value="active">▶️ Active</option>
+              <option value="inactive">⏸️ Inactive</option>
+              <option value="terminee">✅ Terminée</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="sessionForm.get('status')?.invalid && sessionForm.get('status')?.touched">
+              Le statut est requis
+            </div>
+          </div>
+
+          <!-- Surveys (sélection multiple) -->
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-file-earmark-text me-1 text-orange"></i>
+              Formulaire(s) (Survey) <span class="text-orange">*</span>
+            </label>
+            <select class="form-select" 
+                    multiple
+                    size="4"
+                    [class.is-invalid]="sessionForm.get('idSurveys')?.invalid && sessionForm.get('idSurveys')?.touched"
+                    formControlName="idSurveys">
+              <option *ngFor="let survey of surveys" [value]="survey.id">
+                {{ survey.code }} - {{ survey.libelle }}
+              </option>
+            </select>
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Maintenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs surveys
+            </small>
+            <div class="invalid-feedback" *ngIf="sessionForm.get('idSurveys')?.invalid && sessionForm.get('idSurveys')?.touched">
+              Au moins un survey est requis
+            </div>
+          </div>
+        </div>
+
+        <!-- Boutons -->
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-2 border-top">
+          <a routerLink="/sessions" class="btn btn-outline-navy">
+            <i class="bi bi-arrow-left me-1"></i> Annuler
+          </a>
+          <button type="submit" class="btn btn-orange" [disabled]="sessionForm.invalid || loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi" [class.bi-check-lg]="isEditMode" [class.bi-plus-lg]="!isEditMode" *ngIf="!loading"></i>
+            {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,100 @@
+/* Couleurs principales */
+.bg-navy {
+  background-color: #001f3f !important;
+}
+
+.text-navy {
+  color: #001f3f !important;
+}
+
+/* Orange */
+.text-orange {
+  color: #ff6b35 !important;
+}
+
+.btn-orange {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+  color: white;
+  transition: all 0.2s;
+}
+
+.btn-orange:hover {
+  background-color: #e55a2b;
+  border-color: #e55a2b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+  color: white;
+}
+
+/* Form controls */
+.form-control {
+  border-radius: 0.5rem;
+  border: 1px solid #e3e4e5;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 0.2rem rgba(255, 107, 53, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+}
+
+/* Card */
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Invalid feedback */
+.invalid-feedback {
+  font-size: 0.75rem;
+  color: #ff6b35;
+}
+
+.is-invalid {
+  border-color: #ff6b35 !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-header h4 {
+    font-size: 1.1rem;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .d-flex.justify-content-end {
+    justify-content: stretch !important;
+  }
+}

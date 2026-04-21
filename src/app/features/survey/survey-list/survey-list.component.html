@@ -1,54 +1,288 @@
 <div class="container mt-4">
-  
-  <!--bloc debogage -->
-  <div class="alert alert-info">
-    <strong>Debug:</strong> 
-    Loading = {{ loading }} | 
-    Surveys count = {{ surveys.length }} | 
-    Error = {{ error }}
-  </div>
-
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Liste des Surveys</h2>
-    <a routerLink="/surveys/new" class="btn btn-primary">
-      + Nouveau Survey
-    </a>
-  </div>
-
-  <div class="card">
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Code</th>
-              <th>Libellé</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let survey of surveys">
-              <td>{{ survey.id }}</td>
-              <td>{{ survey.code }}</td>
-              <td>{{ survey.libelle }}</td>
-              <td>
-                <a [routerLink]="['/surveys/edit', survey.id]" class="btn btn-sm btn-warning me-2">
-                  Modifier
-                </a>
-                <button class="btn btn-sm btn-danger" (click)="deleteSurvey(survey.id)">
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="surveys.length === 0">
-              <td colspan="4" class="text-center text-muted">
-                Aucun survey trouvé
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <!-- En-tête moderne -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="header-glass animate-fade-in">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="header-icon">
+              <i class="bi bi-file-earmark-text-fill"></i>
+            </div>
+            <div>
+              <h1 class="display-5 fw-bold text-navy mb-0">Liste des Surveys</h1>
+              <p class="text-muted mt-2 mb-0">
+                <i class="bi bi-info-circle-fill me-1 text-orange"></i>
+                Gérez et organisez vos questionnaires d'enquête
+              </p>
+            </div>
+          </div>
+          <a routerLink="/surveys/new" class="btn btn-gradient mt-3 mt-md-0 animate-scale">
+            <i class="bi bi-plus-circle me-2"></i>
+            Nouveau Survey
+          </a>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Cartes statistiques -->
+  <div class="row g-4 mb-4 animate-fade-in-up" *ngIf="!loading && surveys.length > 0">
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-total">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-collection"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total surveys</span>
+          <h2 class="stat-value">{{ surveys.length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-active">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Actifs</span>
+          <h2 class="stat-value">{{ getActiveSurveysCount() }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-inactive">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Inactifs</span>
+          <h2 class="stat-value">{{ surveys.length - getActiveSurveysCount() }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-reference">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Formulaires référence</span>
+          <h2 class="stat-value">{{ getReferenceSurveysCount() }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 SECTION FILTRES AVEC BOUTON RECHERCHE ICÔNE -->
+  <div class="filters-card animate-fade-in-up" *ngIf="!loading && surveys.length > 0">
+    <div class="filters-header">
+      <i class="bi bi-funnel-fill me-2"></i>
+      <strong>Filtres</strong>
+      <button class="btn-reset" (click)="resetFilters()" *ngIf="hasActiveFilters()">
+        <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
+      </button>
+    </div>
+    <div class="filters-body">
+      <div class="filter-group">
+        <div class="filter-input">
+          <i class="bi bi-search"></i>
+          <input type="text" 
+                 [(ngModel)]="tempSearchTerm" 
+                 (keyup.enter)="search()"
+                 placeholder="Rechercher par ID, code, libellé..."
+                 class="filter-search">
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <div class="filter-select">
+          <i class="bi bi-flag"></i>
+          <select [(ngModel)]="tempFilterStatus">
+            <option value="all">Tous les statuts</option>
+            <option value="active">✅ Actifs</option>
+            <option value="inactive">⭕ Inactifs</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <div class="filter-date">
+          <i class="bi bi-calendar-range"></i>
+          <input type="date" 
+                 [(ngModel)]="tempFilterDateFrom" 
+                 class="date-input"
+                 placeholder="Date début">
+          <span class="date-sep">à</span>
+          <input type="date" 
+                 [(ngModel)]="tempFilterDateTo" 
+                 class="date-input"
+                 placeholder="Date fin">
+        </div>
+      </div>
+      
+      <!-- 🔥 BOUTON ICÔNE RECHERCHE -->
+      <div class="filter-button">
+        <button class="btn-search" (click)="search()" title="Rechercher">
+          <i class="bi bi-search"></i>
+          <span>Rechercher</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Affichage des filtres actifs -->
+    <div class="filters-footer" *ngIf="hasActiveFilters()">
+      <i class="bi bi-info-circle me-1"></i>
+      {{ getFilteredCount() }} résultat(s) sur {{ surveys.length }} survey(s)
+      <span class="active-filters">
+        <span *ngIf="activeSearchTerm" class="filter-tag">
+          <i class="bi bi-search me-1"></i> {{ activeSearchTerm }}
+        </span>
+        <span *ngIf="activeFilterStatus !== 'all'" class="filter-tag">
+          <i class="bi bi-flag me-1"></i> {{ activeFilterStatus === 'active' ? 'Actifs' : 'Inactifs' }}
+        </span>
+        <span *ngIf="activeFilterDateFrom" class="filter-tag">
+          <i class="bi bi-calendar me-1"></i> Du {{ activeFilterDateFrom | date:'dd/MM/yyyy' }}
+        </span>
+        <span *ngIf="activeFilterDateTo" class="filter-tag">
+          <i class="bi bi-calendar me-1"></i> Au {{ activeFilterDateTo | date:'dd/MM/yyyy' }}
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container animate-fade-in">
+    <div class="spinner-grow text-orange" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement des surveys en cours...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error && !loading" class="alert-glass alert-danger-glass animate-fade-in">
+    <div class="d-flex align-items-center gap-3">
+      <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+      <div>
+        <strong>Une erreur est survenue</strong><br>
+        {{ error }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des surveys filtrés -->
+  <div *ngIf="!loading && !error && filteredSurveys.length > 0" class="table-container animate-fade-in-up">
+    <div class="table-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="table-title">
+          <i class="bi bi-table me-2 text-orange"></i>
+          <strong>Tous les surveys</strong>
+        </div>
+        <span class="badge-count">
+          <i class="bi bi-database me-1"></i> {{ getFilteredCount() }} survey(s)
+        </span>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th class="col-id"><i class="bi bi-hash me-1"></i> ID</th>
+            <th class="col-code"><i class="bi bi-code-slash me-1"></i> Code</th>
+            <th class="col-libelle"><i class="bi bi-file-text me-1"></i> Libellé</th>
+            <th class="col-date"><i class="bi bi-calendar me-1"></i> Date création</th>
+            <th class="col-status"><i class="bi bi-flag me-1"></i> Statut</th>
+            <th class="col-actions text-center"><i class="bi bi-gear me-1"></i> Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let survey of filteredSurveys; let i = index" class="animate-slide-in" [style.animation-delay]="i * 0.03 + 's'">
+            <td class="col-id" data-label="ID">
+              <span class="id-badge">#{{ survey.id }}</span>
+            </td>
+            <td class="col-code" data-label="Code">
+              <code class="survey-code">{{ survey.code }}</code>
+            </td>
+            <td class="col-libelle" data-label="Libellé">
+              <a [routerLink]="['/surveys', survey.id]" class="survey-link">
+                <i class="bi bi-file-earmark-text me-2 text-orange"></i>
+                <span class="survey-title">{{ survey.libelle }}</span>
+              </a>
+              <div class="survey-subtitle" *ngIf="survey.libelleEn">
+                <i class="bi bi-translate me-1"></i>{{ survey.libelleEn }}
+              </div>
+            </td>
+            <td class="col-date" data-label="Date création">
+              <div class="date-info">
+                <i class="bi bi-calendar-plus me-1 text-muted"></i>
+                <span>{{ survey.dtAdd | date:'dd/MM/yyyy' }}</span>
+                <span class="update-info" *ngIf="survey.dtUpdate !== survey.dtAdd">
+                  <i class="bi bi-pencil-square ms-2 me-1"></i>
+                  {{ survey.dtUpdate | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+            </td>
+            <td class="col-status" data-label="Statut">
+              <span class="status-badge" [class.status-active]="survey.idEtatSurvey === 1" [class.status-inactive]="survey.idEtatSurvey !== 1">
+                <i class="bi" [class.bi-check-circle-fill]="survey.idEtatSurvey === 1" [class.bi-x-circle-fill]="survey.idEtatSurvey !== 1"></i>
+                {{ survey.idEtatSurvey === 1 ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td class="col-actions" data-label="Actions">
+              <div class="action-buttons">
+                <a [routerLink]="['/surveys', survey.id]" class="action-btn btn-view" title="Voir détails">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a [routerLink]="['/surveys/edit', survey.id]" class="action-btn btn-edit" title="Modifier">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button class="action-btn btn-delete" (click)="deleteSurvey(survey.id)" title="Supprimer">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="table-footer">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="footer-info">
+          <i class="bi bi-info-circle me-1 text-orange"></i>
+          {{ getFilteredCount() }} survey(s) affiché(s) sur {{ surveys.length }} total
+        </div>
+        <div class="footer-update">
+          <i class="bi bi-calendar-week me-1 text-orange"></i>
+          Dernière mise à jour: {{ lastUpdate | date:'dd/MM/yyyy HH:mm:ss' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message si aucun résultat après filtrage -->
+  <div *ngIf="!loading && !error && surveys.length > 0 && filteredSurveys.length === 0" class="empty-filter animate-fade-in">
+    <div class="empty-filter-icon">
+      <i class="bi bi-search"></i>
+    </div>
+    <h4>Aucun résultat trouvé</h4>
+    <p>Aucun survey ne correspond à vos critères de recherche</p>
+    <button class="btn btn-gradient" (click)="resetFilters()">
+      <i class="bi bi-arrow-counterclockwise me-2"></i>
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && surveys.length === 0" class="empty-state-modern animate-fade-in">
+    <div class="empty-icon">
+      <i class="bi bi-inbox"></i>
+    </div>
+    <h4>Aucun survey trouvé</h4>
+    <p>Commencez par créer votre premier questionnaire</p>
+    <a routerLink="/surveys/new" class="btn btn-gradient">
+      <i class="bi bi-plus-circle me-2"></i>
+      Créer le premier survey
+    </a>
   </div>
 </div>
