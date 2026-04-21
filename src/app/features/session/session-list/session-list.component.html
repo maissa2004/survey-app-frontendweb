@@ -76,83 +76,102 @@
   </div>
 
   <!-- 🔥 SECTION FILTRES AVEC BOUTON RECHERCHE ICÔNE -->
-<div class="filters-card animate-fade-in-up" *ngIf="!loading && sessions.length > 0">
-  <div class="filters-header">
-    <i class="bi bi-funnel-fill me-2"></i>
-    <strong>Filtres</strong>
-    <button class="btn-reset" (click)="resetFilters()" *ngIf="hasActiveFilters()">
-      <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
-    </button>
-  </div>
-  <div class="filters-body">
-    <div class="filter-group">
-      <div class="filter-input">
-        <i class="bi bi-search"></i>
-        <input type="text" 
-               [(ngModel)]="tempSearchTerm" 
-               (keyup.enter)="search()"
-               placeholder="Rechercher par intitulé, ID, survey..."
-               class="filter-search">
-      </div>
-    </div>
-    
-    <div class="filter-group">
-      <div class="filter-select">
-        <i class="bi bi-flag"></i>
-        <select [(ngModel)]="tempFilterStatus">
-          <option value="all">Tous les statuts</option>
-          <option value="active">▶️ Actives</option>
-          <option value="planifiee">📅 Planifiées</option>
-          <option value="inactive">⏸️ Inactives</option>
-          <option value="terminee">✅ Terminées</option>
-        </select>
-      </div>
-    </div>
-    
-    <div class="filter-group">
-      <div class="filter-date">
-        <i class="bi bi-calendar-range"></i>
-        <input type="date" 
-               [(ngModel)]="tempFilterDateFrom" 
-               class="date-input"
-               placeholder="Date début">
-        <span class="date-sep">à</span>
-        <input type="date" 
-               [(ngModel)]="tempFilterDateTo" 
-               class="date-input"
-               placeholder="Date fin">
-      </div>
-    </div>
-    
-    <!-- 🔥 BOUTON ICÔNE SEULEMENT -->
-    <div class="filter-button">
-      <button class="btn-search" (click)="search()" title="Rechercher">
-        <i class="bi bi-search"></i>
-        <span>Rechercher</span>
+  <div class="filters-card animate-fade-in-up" *ngIf="!loading && sessions.length > 0">
+    <div class="filters-header">
+      <i class="bi bi-funnel-fill me-2"></i>
+      <strong>Filtres</strong>
+      <button class="btn-reset" (click)="resetFilters()" *ngIf="hasActiveFilters()">
+        <i class="bi bi-arrow-counterclockwise me-1"></i> Réinitialiser
       </button>
     </div>
+    <div class="filters-body">
+      <div class="filter-group">
+        <div class="filter-input">
+          <i class="bi bi-search"></i>
+          <input type="text" 
+                 [(ngModel)]="tempSearchTerm" 
+                 (keyup.enter)="search()"
+                 placeholder="Rechercher par intitulé, ID, survey..."
+                 class="filter-search">
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <div class="filter-select">
+          <i class="bi bi-flag"></i>
+          <select [(ngModel)]="tempFilterStatus">
+            <option value="all">Tous les statuts</option>
+            <option value="active">▶️ Actives</option>
+            <option value="planifiee">📅 Planifiées</option>
+            <option value="inactive">⏸️ Inactives</option>
+            <option value="terminee">✅ Terminées</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filter-group">
+        <div class="filter-date">
+          <i class="bi bi-calendar-range"></i>
+          <input type="date" 
+                 [(ngModel)]="tempFilterDateFrom" 
+                 class="date-input"
+                 placeholder="Date début">
+          <span class="date-sep">à</span>
+          <input type="date" 
+                 [(ngModel)]="tempFilterDateTo" 
+                 class="date-input"
+                 placeholder="Date fin">
+        </div>
+      </div>
+      
+      <!-- 🔥 FILTRE PAR ENQUÊTEUR -->
+      <div class="filter-group">
+        <div class="filter-input">
+          <i class="bi bi-people"></i>
+          <input type="text" 
+                 [(ngModel)]="tempFilterEnqueteur" 
+                 (keyup.enter)="search()"
+                 placeholder="Rechercher par enquêteur..."
+                 class="filter-search"
+                 list="enqueteurs-list">
+          <datalist id="enqueteurs-list">
+            <option *ngFor="let enqueteur of allEnqueteurs" [value]="enqueteur"></option>
+          </datalist>
+        </div>
+      </div>
+      
+      <!-- 🔥 BOUTON ICÔNE RECHERCHE -->
+      <div class="filter-button">
+        <button class="btn-search" (click)="search()" title="Rechercher">
+          <i class="bi bi-search"></i>
+          <span>Rechercher</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Affichage des filtres actifs -->
+    <div class="filters-footer" *ngIf="hasActiveFilters()">
+      <i class="bi bi-info-circle me-1"></i>
+      {{ getFilteredCount() }} résultat(s) sur {{ sessions.length }} session(s)
+      <span class="active-filters">
+        <span *ngIf="activeSearchTerm" class="filter-tag">
+          <i class="bi bi-search me-1"></i> {{ activeSearchTerm }}
+        </span>
+        <span *ngIf="activeFilterStatus !== 'all'" class="filter-tag">
+          <i class="bi bi-flag me-1"></i> {{ getStatusLabel(activeFilterStatus) }}
+        </span>
+        <span *ngIf="activeFilterDateFrom" class="filter-tag">
+          <i class="bi bi-calendar me-1"></i> Du {{ activeFilterDateFrom | date:'dd/MM/yyyy' }}
+        </span>
+        <span *ngIf="activeFilterDateTo" class="filter-tag">
+          <i class="bi bi-calendar me-1"></i> Au {{ activeFilterDateTo | date:'dd/MM/yyyy' }}
+        </span>
+        <span *ngIf="activeFilterEnqueteur" class="filter-tag">
+          <i class="bi bi-people me-1"></i> Enquêteur: {{ activeFilterEnqueteur }}
+        </span>
+      </span>
+    </div>
   </div>
-  
-  <!-- Affichage des filtres actifs -->
-  <div class="filters-footer" *ngIf="hasActiveFilters()">
-    <i class="bi bi-info-circle me-1"></i>
-    {{ getFilteredCount() }} résultat(s) sur {{ sessions.length }} session(s)
-    <span class="active-filters">
-      <span *ngIf="activeSearchTerm" class="filter-tag">
-        <i class="bi bi-search me-1"></i> {{ activeSearchTerm }}
-      </span>
-      <span *ngIf="activeFilterStatus !== 'all'" class="filter-tag">
-        <i class="bi bi-flag me-1"></i> {{ getStatusLabel(activeFilterStatus) }}
-      </span>
-      <span *ngIf="activeFilterDateFrom" class="filter-tag">
-        <i class="bi bi-calendar me-1"></i> Du {{ activeFilterDateFrom | date:'dd/MM/yyyy' }}
-      </span>
-      <span *ngIf="activeFilterDateTo" class="filter-tag">
-        <i class="bi bi-calendar me-1"></i> Au {{ activeFilterDateTo | date:'dd/MM/yyyy' }}
-      </span>
-    </span>
-  </div>
-</div>
 
   <!-- Loading spinner -->
   <div *ngIf="loading" class="loading-container animate-fade-in">
@@ -256,11 +275,12 @@
                     <span class="survey-code">{{ survey.code }}</span>
                     <span class="survey-libelle">{{ survey.libelle }}</span>
                   </div>
+                  <!-- 🔥 CORRECTION ICI : Utiliser survey.id au lieu de survey.sessionSurveyId -->
                   <button class="btn-add-enqueteur" 
-                          (click)="openEnqueteurModal(survey.sessionSurveyId, survey.code + ' - ' + survey.libelle)"
-                          title="Affecter un enquêteur">
-                    <i class="bi bi-person-plus"></i>
-                  </button>
+        (click)="openEnqueteurModal(survey.sessionSurveyId, survey.code + ' - ' + survey.libelle)"
+        title="Affecter un enquêteur">
+  <i class="bi bi-person-plus"></i>
+</button>
                 </div>
                 
                 <!-- Enquêteurs -->
@@ -269,8 +289,8 @@
                     <i class="bi bi-person-circle"></i>
                     <span>{{ enqueteur.username }}</span>
                     <i class="bi bi-x-circle-fill remove-icon" 
-                       (click)="removeEnqueteur(survey.sessionSurveyId, enqueteur.idUser, $event)"></i>
-                  </div>
+   (click)="removeEnqueteur(survey.sessionSurveyId, enqueteur.idUser, $event)"></i>
+  </div>
                 </div>
                 <div class="no-enqueteurs" *ngIf="!survey.enqueteurs || survey.enqueteurs.length === 0">
                   <i class="bi bi-people"></i>

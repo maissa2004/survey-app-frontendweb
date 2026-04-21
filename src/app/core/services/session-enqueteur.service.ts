@@ -33,6 +33,11 @@ export class SessionEnqueteurService {
 
   constructor(private http: HttpClient) {}
 
+  // 🔥 AJOUTER CETTE MÉTHODE - Récupérer les enquêteurs par session_survey
+  getEnqueteursBySessionSurvey(sessionSurveyId: number): Observable<SessionEnqueteur[]> {
+    return this.http.get<SessionEnqueteur[]>(`${this.apiUrl}/session-survey/${sessionSurveyId}`);
+  }
+
   getEnqueteursBySession(sessionId: number): Observable<SessionEnqueteur[]> {
     return this.http.get<SessionEnqueteur[]>(`${this.apiUrl}/session/${sessionId}`);
   }
@@ -49,7 +54,10 @@ export class SessionEnqueteurService {
     return this.http.post<SessionEnqueteur>(`${this.apiUrl}/assign`, body);
   }
 
-  removeEnqueteur(sessionSurveyId: number, userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/session-survey/${sessionSurveyId}/user/${userId}`);
-  }
+  // Dans session-enqueteur.service.ts
+removeEnqueteur(sessionSurveyId: number, userId: number): Observable<void> {
+  console.log('Appel API DELETE:', `${this.apiUrl}/session-survey/${sessionSurveyId}/user/${userId}`);
+  return this.http.delete<void>(`${this.apiUrl}/session-survey/${sessionSurveyId}/user/${userId}`);
+}
+  
 }
