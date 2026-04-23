@@ -167,11 +167,11 @@ export class SurveyDetailComponent implements OnInit {
         code: this.sectionForm.value.code,
         title: this.sectionForm.value.title,
         titleEn: this.sectionForm.value.titleEn || '',
-        conditionnel: this.sectionForm.value.conditionnel === true,
+        isConditionnel: this.sectionForm.value.conditionnel === true ,
         ordre: Number(this.sectionForm.value.ordre) || 1,
         dtUpdate: today,
         idReferencedForm: 0,
-        idSurvey: this.survey.id   
+idSurvey: this.survey.id  
       };
       
       console.log('Envoi avec survey.id:', this.survey.id);
@@ -190,35 +190,44 @@ export class SurveyDetailComponent implements OnInit {
   }
 
   addSubSection(): void {
-    if (this.subSectionForm.valid && this.survey && this.selectedParentSection) {
-      const today = new Date().toISOString().split('T')[0];
-      const conditionnelValue = this.subSectionForm.value.conditionnel === true ? 1 : 0;
-      
-      const sectionData = {
-        code: this.subSectionForm.value.code,
-        title: this.subSectionForm.value.title,
-        titleEn: this.subSectionForm.value.titleEn || '',
-        conditionnel: conditionnelValue,
-        ordre: Number(this.subSectionForm.value.ordre) || 1,
-        dtUpdate: today,
-        idReferencedForm: 0,
-        idSurvey: this.survey.id
-      };
-      
-      console.log('📤 Envoi sous-section:', sectionData);
-      
-      this.http.post('/api/section', sectionData).subscribe({
-        next: () => {
-          this.loadSurvey(this.survey!.id!);
-          this.subSectionForm.reset();
-          this.showSubSectionForm = false;
-          this.selectedParentSection = null;
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Erreur création sous-section:', err)
-      });
-    }
+  if (this.subSectionForm.valid && this.survey && this.selectedParentSection) {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const sectionData = {
+      code: this.subSectionForm.value.code,
+      title: this.subSectionForm.value.title,
+      titleEn: this.subSectionForm.value.titleEn || '',
+      isConditionnel: this.subSectionForm.value.conditionnel === true,  
+      ordre: Number(this.subSectionForm.value.ordre) || 1,
+      dtUpdate: today,
+      idReferencedForm: 0,
+      idSurvey: this.survey.id  
+    };
+    
+    console.log('📤 Envoi sous-section:', JSON.stringify(sectionData));
+    
+    this.http.post('/api/section', sectionData).subscribe({
+      next: (newSection: any) => {
+        console.log('✅ Sous-section créée:', newSection);
+        this.loadSurvey(this.survey!.id!);
+        this.subSectionForm.reset();
+        this.showSubSectionForm = false;
+        this.selectedParentSection = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Erreur création sous-section:', err);
+        console.error('❌ Détails:', err.error);
+        alert('Erreur lors de la création de la sous-section');
+      }
+    });
+  } else {
+    console.log('❌ Formulaire invalide ou paramètres manquants');
+    console.log('subSectionForm.valid:', this.subSectionForm.valid);
+    console.log('survey:', this.survey);
+    console.log('selectedParentSection:', this.selectedParentSection);
   }
+}
 
   editSection(section: Section): void {
     this.editingSection = section;
@@ -365,6 +374,8 @@ export class SurveyDetailComponent implements OnInit {
   }
 
   saveQuestion(): void {
+  console.log('💾 SAVE QUESTION CALLED');
+  
   if (this.questionForm.valid && this.selectedSection && this.survey) {
     const idNmTypeQuest = Number(this.questionForm.value.id_nm_type_quest);
     const needsAnswers = this.requiresAnswers(idNmTypeQuest);
@@ -383,35 +394,49 @@ export class SurveyDetailComponent implements OnInit {
     };
     
     if (this.editingQuestion) {
-  const questionId = this.editingQuestion.id;
-  if (!questionId) return;
-  
-  const needsAnswers = this.requiresAnswers(idNmTypeQuest);
-  const oldAnswers = this.editingQuestion.answers || [];
-  const answersChanged = JSON.stringify(oldAnswers) !== JSON.stringify(answers);
-  
-  this.http.put(`/api/question/${questionId}`, questionData).subscribe({
-    next: () => {
-      if (needsAnswers && answers.length > 0 && answersChanged) {
-        // Supprimer les anciennes et créer les nouvelles
-        this.deleteAnswersForQuestion(questionId, () => {
-          this.saveAnswersForQuestion(questionId, answers, () => {
-            this.loadSurvey(this.survey!.id!);
-            this.cancelQuestionForm();
-          });
-        });
-      } else if (needsAnswers && answers.length > 0 && !answersChanged) {
-        // Pas de changement, juste recharger
-        this.loadSurvey(this.survey!.id!);
-        this.cancelQuestionForm();
-      } else {
-        this.loadSurvey(this.survey!.id!);
-        this.cancelQuestionForm();
-      }
-    },
-    error: (err) => console.error('❌ Erreur mise à jour:', err)
-  });
-}}}
+      // MODIFICATION - code existant
+      const questionId = this.editingQuestion.id;
+      if (!questionId) return;
+      
+      this.http.put(`/api/question/${questionId}`, questionData).subscribe({
+        next: () => {
+          // Gérer les réponses...
+          this.loadSurvey(this.survey!.id!);
+          this.cancelQuestionForm();
+        },
+        error: (err) => console.error('❌ Erreur mise à jour:', err)
+      });
+    } else {
+      // 🔥 CRÉATION - AJOUTER CETTE PARTIE
+      this.http.post('/api/question', questionData).subscribe({
+        next: (newQuestion: any) => {
+          console.log('✅ Question créée:', newQuestion);
+          const questionId = newQuestion.id;
+          
+          // 1. Sauvegarder les réponses si nécessaire
+          if (needsAnswers && answers.length > 0) {
+            this.saveAnswersForQuestion(questionId, answers, () => {
+              // 2. Créer la liaison section_question
+              this.createSectionQuestion(questionId);
+            });
+          } else {
+            // 2. Créer la liaison section_question
+            this.createSectionQuestion(questionId);
+          }
+        },
+        error: (err) => {
+          console.error('❌ Erreur création question:', err);
+          alert('Erreur lors de la création de la question');
+        }
+      });
+    }
+  } else {
+    console.log('❌ Formulaire invalide ou section non sélectionnée');
+    console.log('Form valid:', this.questionForm.valid);
+    console.log('selectedSection:', this.selectedSection);
+    console.log('survey:', this.survey);
+  }
+}
 
 
 deleteAnswersForQuestion(questionId: number, callback: () => void): void {
@@ -439,8 +464,7 @@ deleteAnswersForQuestion(questionId: number, callback: () => void): void {
 
 
 saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void): void {
-  if (!questionId) {
-    console.error('❌ ID de question invalide');
+  if (!questionId || answers.length === 0) {
     callback();
     return;
   }
@@ -448,13 +472,6 @@ saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void)
   let completed = 0;
   const total = answers.length;
   const today = new Date().toISOString().split('T')[0];
-  
-  console.log(`📝 Sauvegarde de ${total} réponse(s) pour la question ${questionId}`);
-  
-  if (total === 0) {
-    callback();
-    return;
-  }
   
   answers.forEach((answer, index) => {
     const nmAnswersData = {
@@ -465,23 +482,9 @@ saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void)
       dtUpdate: today
     };
     
-    console.log(`📤 [${index + 1}/${total}] Création NmAnswers:`, nmAnswersData);
-    
     this.http.post('/api/nmAnswers', nmAnswersData).subscribe({
       next: (nmAnswer: any) => {
-        const nmAnswerId = nmAnswer?.id ?? nmAnswer?.getid?.();
-        
-        if (!nmAnswerId) {
-          console.error(`❌ [${index + 1}/${total}] Pas d'ID retourné`);
-          completed++;
-          if (completed === total) {
-            console.log('🎯 Toutes les réponses traitées (avec erreurs), appel du callback');
-            callback();
-          }
-          return;
-        }
-        
-        console.log(`✅ [${index + 1}/${total}] NmAnswers créée, ID: ${nmAnswerId}`);
+        const nmAnswerId = nmAnswer.id;
         
         const questionAnswersData = {
           isConditionnel: false,
@@ -490,34 +493,20 @@ saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void)
           nmAnswers: { id: nmAnswerId }
         };
         
-        console.log(`📤 [${index + 1}/${total}] Création QuestionAnswers:`, questionAnswersData);
-        
         this.http.post('/api/questionAnswers', questionAnswersData).subscribe({
           next: () => {
             completed++;
-            console.log(`✅ [${index + 1}/${total}] Réponse sauvegardée (${completed}/${total})`);
-            if (completed === total) {
-              console.log('🎯 Toutes les réponses sauvegardées, appel du callback');
-              callback();
-            }
+            if (completed === total) callback();
           },
-          error: (err) => {
-            console.error(`❌ [${index + 1}/${total}] Erreur QuestionAnswers:`, err);
+          error: () => {
             completed++;
-            if (completed === total) {
-              console.log('🎯 Toutes les réponses traitées (avec erreurs), appel du callback');
-              callback();
-            }
+            if (completed === total) callback();
           }
         });
       },
-      error: (err) => {
-        console.error(`❌ [${index + 1}/${total}] Erreur création NmAnswers:`, err);
+      error: () => {
         completed++;
-        if (completed === total) {
-          console.log('🎯 Toutes les réponses traitées (avec erreurs), appel du callback');
-          callback();
-        }
+        if (completed === total) callback();
       }
     });
   });
@@ -551,41 +540,34 @@ private createQuestionAnswer(questionId: number, nmAnswerId: number, today: stri
 
   // ✅ NOUVELLE MÉTHODE : Créer la section_question
   createSectionQuestion(questionId: number): void {
-    const sectionQuestionData = {
-      required: this.questionForm.value.required,
-      conditionnel: this.questionForm.value.conditionnel,
-      ordre: this.selectedSection!.questions ? this.selectedSection!.questions.length + 1 : 1,
-      dtUpdate: new Date().toISOString().split('T')[0],
-      idSection: this.selectedSection!.id,
-      idQuestion: questionId
-    };
-    
-    console.log('📤 Étape 2 - Création section_question:', sectionQuestionData);
-    
-    this.http.post('/api/sectionQuestion', sectionQuestionData).subscribe({
-      next: () => {
-        console.log('✅ Section_question créée avec succès');
-        console.log('🔄 Rechargement du survey...');
-        this.loadSurvey(this.survey!.id!);
-        this.showQuestionForm = false;
-        this.questionForm.reset();
-        
-        // Vider le FormArray des réponses
-        const answersArray = this.getAnswersArray();
-        while (answersArray.length) {
-          answersArray.removeAt(0);
-        }
-
-         this.cdr.detectChanges();
-
-      },
-      error: (err) => {
-        console.error('❌ Erreur création section_question:', err);
-        // Si la section_question échoue, supprimer la question créée
-        this.http.delete(`/api/question/${questionId}`).subscribe();
-      }
-    });
-  }
+  console.log('📤 Création section_question pour questionId:', questionId);
+  
+  const sectionQuestionData = {
+    required: this.questionForm.value.required ? 1 : 0,
+    conditionnel: this.questionForm.value.conditionnel ? 1 : 0,
+    ordre: this.selectedSection!.questions ? this.selectedSection!.questions.length + 1 : 1,
+    dtUpdate: new Date().toISOString().split('T')[0],
+    idSection: this.selectedSection!.id,
+    idQuestion: questionId
+  };
+  
+  console.log('📤 Données section_question:', sectionQuestionData);
+  
+  this.http.post('/api/sectionQuestion', sectionQuestionData).subscribe({
+    next: () => {
+      console.log('✅ Section_question créée avec succès');
+      this.loadSurvey(this.survey!.id!);
+      this.showQuestionForm = false;
+      this.cancelQuestionForm();
+    },
+    error: (err) => {
+      console.error('❌ Erreur création section_question:', err);
+      // Supprimer la question créée si la liaison échoue
+      this.http.delete(`/api/question/${questionId}`).subscribe();
+      alert('Erreur lors de la liaison de la question à la section');
+    }
+  });
+}
 
   onTypeChange(event: any): void {
   const value = +event.target.value;  // Convertit en nombre
