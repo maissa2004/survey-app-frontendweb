@@ -1,7 +1,8 @@
 <!-- src/app/core/components/header/header.component.html -->
+
 <nav class="navbar navbar-expand-lg bg-navy fixed-top" *ngIf="isBrowser && authService.isAuthenticated()">
-    <div class="container">
-    <a class="navbar-brand text-white fw-bold" routerLink="/surveys">
+  <div class="container">
+    <a class="navbar-brand text-white fw-bold" [routerLink]="getHomeLink()">
       <i class="bi bi-file-earmark-text-fill text-orange me-2"></i>
       SurveyManager
     </a>
@@ -12,16 +13,29 @@
     
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link text-white" routerLink="/surveys" routerLinkActive="active">
-            <i class="bi bi-files me-1"></i> Surveys
+        
+        <!-- 🔥 SUPER ADMIN - Gestion des users UNIQUEMENT -->
+        <li class="nav-item" *ngIf="authService.isSuperAdmin()">
+          <a class="nav-link text-white" routerLink="/user-management" routerLinkActive="active">
+            <i class="bi bi-people-fill me-1"></i> Gestion Utilisateurs
           </a>
         </li>
-        <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link text-white" routerLink="/sessions" routerLinkActive="active">
-            <i class="bi bi-calendar-event me-1"></i> Sessions
-          </a>
-        </li>
+        
+        <!-- 🔥 ADMIN NORMAL (uniquement, pas le super admin) -->
+        <ng-container *ngIf="authService.isNormalAdmin()">
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/surveys" routerLinkActive="active">
+              <i class="bi bi-files me-1"></i> Surveys
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/sessions" routerLinkActive="active">
+              <i class="bi bi-calendar-event me-1"></i> Sessions
+            </a>
+          </li>
+        </ng-container>
+        
+        <!-- Menu dropdown utilisateur -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
             <i class="bi bi-person-circle me-1"></i> {{ (authService.getCurrentUser()?.username) || 'User' }}
@@ -38,5 +52,4 @@
   </div>
 </nav>
 
-<!-- Ajouter un padding-top pour compenser le header fixe -->
 <div style="padding-top: 70px;" *ngIf="isBrowser && authService.isAuthenticated()"></div>

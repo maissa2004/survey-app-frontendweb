@@ -234,9 +234,11 @@
               <a [routerLink]="['/sessions/edit', session.id]" class="action-icon" title="Modifier">
                 <i class="bi bi-pencil"></i>
               </a>
-              <button class="action-icon text-danger" (click)="deleteSession(session.id)" title="Supprimer">
-                <i class="bi bi-trash"></i>
-              </button>
+              <button class="action-icon text-danger" 
+        (click)="deleteSession(session.id)" 
+        title="Supprimer">
+  <i class="bi bi-trash"></i>
+</button>
             </div>
           </div>
         </div>

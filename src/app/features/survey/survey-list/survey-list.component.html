@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <!-- 🔥 SECTION FILTRES AVEC BOUTON RECHERCHE ICÔNE -->
+  <!-- SECTION FILTRES -->
   <div class="filters-card animate-fade-in-up" *ngIf="!loading && surveys.length > 0">
     <div class="filters-header">
       <i class="bi bi-funnel-fill me-2"></i>
@@ -120,11 +120,10 @@
         </div>
       </div>
       
-      <!-- 🔥 BOUTON ICÔNE RECHERCHE -->
+      <!-- BOUTON ICÔNE RECHERCHE -->
       <div class="filter-button">
         <button class="btn-search" (click)="search()" title="Rechercher">
           <i class="bi bi-search"></i>
-          <span>Rechercher</span>
         </button>
       </div>
     </div>
@@ -133,7 +132,7 @@
     <div class="filters-footer" *ngIf="hasActiveFilters()">
       <i class="bi bi-info-circle me-1"></i>
       {{ getFilteredCount() }} résultat(s) sur {{ surveys.length }} survey(s)
-      <span class="active-filters">
+      <div class="active-filters">
         <span *ngIf="activeSearchTerm" class="filter-tag">
           <i class="bi bi-search me-1"></i> {{ activeSearchTerm }}
         </span>
@@ -146,7 +145,7 @@
         <span *ngIf="activeFilterDateTo" class="filter-tag">
           <i class="bi bi-calendar me-1"></i> Au {{ activeFilterDateTo | date:'dd/MM/yyyy' }}
         </span>
-      </span>
+      </div>
     </div>
   </div>
 
@@ -169,10 +168,10 @@
     </div>
   </div>
 
-  <!-- Tableau des surveys filtrés -->
+  <!-- Tableau des surveys -->
   <div *ngIf="!loading && !error && filteredSurveys.length > 0" class="table-container animate-fade-in-up">
     <div class="table-header">
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="table-title">
           <i class="bi bi-table me-2 text-orange"></i>
           <strong>Tous les surveys</strong>

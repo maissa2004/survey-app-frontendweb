@@ -1,3 +1,57 @@
+
+/* survey-detail.component.css - Ajouter */
+
+/* Animation pour les cartes section */
+.section-card {
+  transition: all 0.3s ease;
+}
+
+.section-card.deleting {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* Bouton suppression question */
+.btn-delete-question {
+  background: #ffe8e8;
+  color: #dc3545;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-delete-question:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Modal de confirmation pour la suppression */
+.confirm-delete-modal .modal-content {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.confirm-delete-modal .modal-header {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+  border: none;
+}
+
+.confirm-delete-modal .modal-footer {
+  border-top: none;
+}
+
+.confirm-delete-modal .btn-danger {
+  background: #dc3545;
+}
+
 /* Couleurs principales */
 .bg-navy {
   background-color: #001f3f !important;

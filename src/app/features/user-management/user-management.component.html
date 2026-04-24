@@ -1,0 +1,280 @@
+<div class="container-fluid px-4 py-3">
+  <!-- En-tête -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="header-glass animate-fade-in">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="header-icon">
+              <i class="bi bi-people-fill"></i>
+            </div>
+            <div>
+              <h1 class="display-5 fw-bold text-navy mb-0">Gestion des Utilisateurs</h1>
+              <p class="text-muted mt-2 mb-0">
+                <i class="bi bi-info-circle-fill me-1 text-orange"></i>
+                Gérez les comptes administrateurs et enquêteurs de la plateforme
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-gradient mt-3 mt-md-0 animate-scale" (click)="showCreateForm = !showCreateForm">
+            <i class="bi" [class.bi-plus-circle]="!showCreateForm" [class.bi-x-circle]="showCreateForm"></i>
+            {{ showCreateForm ? 'Fermer' : 'Nouvel utilisateur' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cartes statistiques -->
+  <div class="row g-4 mb-4 animate-fade-in-up" *ngIf="!loading && users.length > 0">
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-total">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Total utilisateurs</span>
+          <h2 class="stat-value">{{ users.length }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-admin">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Administrateurs</span>
+          <h2 class="stat-value">{{ getAdminCount() }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-enqueteur">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Enquêteurs</span>
+          <h2 class="stat-value">{{ getEnqueteurCount() }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card-modern stat-active">
+        <div class="stat-icon-wrapper">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-label">Actifs</span>
+          <h2 class="stat-value">{{ getActiveCount() }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert-glass alert-success-glass animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+        <div>
+          <strong>Succès !</strong><br>
+          {{ successMessage }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="successMessage = null"></button>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert-glass alert-danger-glass animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
+        <div>
+          <strong>Erreur</strong><br>
+          {{ error }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="error = null"></button>
+    </div>
+  </div>
+
+  <!-- Formulaire de création -->
+  <div class="card-glass animate-slide-down" *ngIf="showCreateForm">
+    <div class="card-glass-header bg-gradient-primary">
+      <h5 class="mb-0">
+        <i class="bi bi-person-plus-fill me-2"></i>
+        Créer un utilisateur
+      </h5>
+      <small class="text-white-50">Remplissez les informations ci-dessous</small>
+    </div>
+    <div class="card-glass-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-person me-1 text-orange"></i>
+            Nom d'utilisateur <span class="text-danger">*</span>
+          </label>
+          <input type="text" class="form-control form-control-modern" 
+                 [(ngModel)]="newUser.username" 
+                 placeholder="ex: jean.dupont">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-envelope me-1 text-orange"></i>
+            Email
+          </label>
+          <input type="email" class="form-control form-control-modern" 
+                 [(ngModel)]="newUser.email" 
+                 placeholder="ex: jean@example.com">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-phone me-1 text-orange"></i>
+            Téléphone
+          </label>
+          <input type="text" class="form-control form-control-modern" 
+                 [(ngModel)]="newUser.phone" 
+                 placeholder="ex: 0612345678">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-lock me-1 text-orange"></i>
+            Mot de passe <span class="text-danger">*</span>
+          </label>
+          <input type="password" class="form-control form-control-modern" 
+                 [(ngModel)]="newUser.password" 
+                 placeholder="******">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-tag me-1 text-orange"></i>
+            Rôle <span class="text-danger">*</span>
+          </label>
+          <select class="form-select form-select-modern" [(ngModel)]="newUser.role">
+            <option value="admin">👑 Administrateur (accès web)</option>
+            <option value="enqueteur">📱 Enquêteur (mobile uniquement)</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 d-flex gap-2 justify-content-end">
+        <button class="btn btn-outline-navy" (click)="cancelCreateForm()">
+          <i class="bi bi-x-lg me-1"></i> Annuler
+        </button>
+        <button class="btn btn-gradient" (click)="createUser()" [disabled]="!newUser.username || !newUser.password">
+          <i class="bi bi-check-lg me-1"></i> Créer l'utilisateur
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container animate-fade-in">
+    <div class="spinner-grow text-orange" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement des utilisateurs...</p>
+  </div>
+
+  <!-- Tableau des utilisateurs -->
+  <div *ngIf="!loading && users.length > 0" class="table-container animate-fade-in-up">
+    <div class="table-header">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="table-title">
+          <i class="bi bi-table me-2 text-orange"></i>
+          <strong>Liste des utilisateurs</strong>
+        </div>
+        <span class="badge-count">
+          <i class="bi bi-database me-1"></i> {{ users.length }} utilisateur(s)
+        </span>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th><i class="bi bi-hash me-1"></i> ID</th>
+            <th><i class="bi bi-person me-1"></i> Utilisateur</th>
+            <th><i class="bi bi-envelope me-1"></i> Email</th>
+            <th><i class="bi bi-phone me-1"></i> Téléphone</th>
+            <th><i class="bi bi-tag me-1"></i> Rôle</th>
+            <th><i class="bi bi-shield-lock me-1"></i> Accès Web</th>
+            <th class="text-center"><i class="bi bi-gear me-1"></i> Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users; let i = index" class="animate-slide-in" [style.animation-delay]="i * 0.03 + 's'">
+            <td data-label="ID">
+              <span class="id-badge">#{{ user.id }}</span>
+            </td>
+            <td data-label="Utilisateur">
+              <div class="user-info">
+                <div class="user-avatar">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <div>
+                  <div class="fw-semibold">{{ user.username }}</div>
+                  <span *ngIf="user.username === 'admin'" class="super-badge">SUPER ADMIN</span>
+                </div>
+              </div>
+            </td>
+            <td data-label="Email">
+              <span class="text-muted">{{ user.email || '-' }}</span>
+            </td>
+            <td data-label="Téléphone">
+              <span class="text-muted">{{ user.phone || '-' }}</span>
+            </td>
+            <td data-label="Rôle">
+              <span class="role-badge" [ngClass]="user.role === 'admin' ? 'role-admin' : 'role-enqueteur'">
+                <i class="bi" [ngClass]="user.role === 'admin' ? 'bi-shield-lock-fill' : 'bi-phone-fill'"></i>
+                {{ user.role === 'admin' ? 'Administrateur' : 'Enquêteur' }}
+              </span>
+            </td>
+            <td data-label="Accès Web">
+              <span class="access-badge" [ngClass]="user.role === 'admin' ? 'access-allowed' : 'access-denied'">
+                <i class="bi" [ngClass]="user.role === 'admin' ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                {{ user.role === 'admin' ? 'Autorisé' : 'Non autorisé' }}
+              </span>
+            </td>
+            <td data-label="Actions" class="text-center">
+              <button class="action-btn btn-delete" 
+                      (click)="deleteUser(user.id)" 
+                      *ngIf="user.username !== 'admin'"
+                      title="Supprimer">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="table-footer">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+        <div class="footer-info">
+          <i class="bi bi-info-circle me-1 text-orange"></i>
+          {{ users.length }} utilisateur(s) au total
+        </div>
+        <div class="footer-note">
+          <i class="bi bi-shield-exclamation me-1 text-warning"></i>
+          Les comptes enquêteurs ne peuvent pas accéder à l'application web
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && users.length === 0" class="empty-state-modern animate-fade-in">
+    <div class="empty-icon">
+      <i class="bi bi-people"></i>
+    </div>
+    <h4>Aucun utilisateur</h4>
+    <p>Commencez par créer votre premier utilisateur</p>
+    <button class="btn btn-gradient" (click)="showCreateForm = true">
+      <i class="bi bi-plus-circle me-2"></i>
+      Créer le premier utilisateur
+    </button>
+  </div>
+</div>

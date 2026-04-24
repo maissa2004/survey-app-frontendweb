@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { Survey, Section, Question, Answer, NmTypeQuest } from '../../../core/models/survey';
 import { getIconForType } from '../../../core/utils/question-type-icons';
 import { QuestionService } from '../../../core/services';
+import { ConfirmService } from '../../../core/services/confirm.service';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'app-survey-detail',
@@ -39,7 +41,9 @@ export class SurveyDetailComponent implements OnInit {
     private fb: FormBuilder,
     private questionService: QuestionService,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private alertService: AlertService,
+  private confirmService: ConfirmService
   ) {
     this.sectionForm = this.fb.group({
       code: ['', Validators.required],
@@ -244,36 +248,65 @@ idSurvey: this.survey.id
   }
 
   updateSection(): void {
-    if (this.sectionForm.valid && this.editingSection) {
-      const updatedSection = { 
-        ...this.editingSection, 
-        ...this.sectionForm.value,
-        conditionnel: this.sectionForm.value.conditionnel ? 1 : 0
-      };
-      this.http.put<Section>(`/api/section/${this.editingSection.id}`, updatedSection).subscribe({
-        next: () => {
-          this.loadSurvey(this.survey!.id!);
-          this.sectionForm.reset();
-          this.showSectionForm = false;
-          this.editingSection = null;
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Erreur mise à jour section:', err)
-      });
-    }
+  if (this.sectionForm.valid && this.editingSection) {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 🔥 Créer un objet propre avec seulement les champs attendus par le backend
+    const sectionData = {
+      code: this.sectionForm.value.code,
+      title: this.sectionForm.value.title,
+      titleEn: this.sectionForm.value.titleEn || '',
+      isConditionnel: this.sectionForm.value.conditionnel === true,
+      ordre: Number(this.sectionForm.value.ordre) || 1,
+      dtUpdate: today,
+      idReferencedForm: this.editingSection.idReferencedForm || 0,
+      idSurvey: this.editingSection.idSurvey || this.survey?.id
+    };
+    
+    console.log('📤 Mise à jour section:', JSON.stringify(sectionData));
+    
+    this.http.put(`/api/section/${this.editingSection.id}`, sectionData).subscribe({
+      next: () => {
+        this.alertService.showSuccess('Section modifiée', `La section "${this.sectionForm.value.title}" a été modifiée avec succès.`);
+        this.loadSurvey(this.survey!.id!);
+        this.sectionForm.reset();
+        this.showSectionForm = false;
+        this.editingSection = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Erreur mise à jour section:', err);
+        this.alertService.showError('Erreur', err.error?.message || 'Erreur lors de la mise à jour de la section');
+      }
+    });
   }
+}
 
-  deleteSection(id: number): void {
-    if (confirm('Supprimer cette section ?')) {
-      this.http.delete(`/api/section/${id}`).subscribe({
-        next: () => {
-          this.loadSurvey(this.survey!.id!);
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Erreur suppression section:', err)
-      });
+  // survey-detail.component.ts
+
+async deleteSection(id: number): Promise<void> {
+  const section = this.sections.find(s => s.id === id);
+  
+  const confirmed = await this.confirmService.show({
+    title: 'Confirmation de suppression',
+    message: `Êtes-vous sûr de vouloir supprimer la section "${section?.title}" ? Toutes les questions associées seront également supprimées.`,
+    confirmText: 'Supprimer',
+    cancelText: 'Annuler',
+    type: 'danger'
+  });
+  
+  if (!confirmed) return;
+  
+  this.http.delete(`/api/section/${id}`).subscribe({
+    next: () => {
+      this.alertService.showSuccess('Section supprimée', `La section "${section?.title}" a été supprimée avec succès.`);
+      this.loadSurvey(this.survey!.id!);
+    },
+    error: (err) => {
+      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression');
     }
-  }
+  });
+}
 
   cancelSectionForm(): void {
     this.showSectionForm = false;
@@ -382,7 +415,7 @@ idSurvey: this.survey.id
     const answers = this.questionForm.value.answers || [];
     
     if (needsAnswers && answers.length === 0) {
-      alert('Ce type de question nécessite au moins une réponse.');
+      this.alertService.showWarning('Attention', 'Ce type de question nécessite au moins une réponse.');
       return;
     }
     
@@ -394,69 +427,69 @@ idSurvey: this.survey.id
     };
     
     if (this.editingQuestion) {
-      // MODIFICATION - code existant
+      // 🔥 MODIFICATION - CORRIGÉ
       const questionId = this.editingQuestion.id;
       if (!questionId) return;
       
+      // 1. Mettre à jour la question
       this.http.put(`/api/question/${questionId}`, questionData).subscribe({
         next: () => {
-          // Gérer les réponses...
-          this.loadSurvey(this.survey!.id!);
-          this.cancelQuestionForm();
+          // 2. Supprimer les anciennes réponses
+          this.deleteAnswersForQuestion(questionId, () => {
+            // 3. Créer les nouvelles réponses si nécessaire
+            if (needsAnswers && answers.length > 0) {
+              this.saveAnswersForQuestion(questionId, answers, () => {
+                this.loadSurvey(this.survey!.id!);
+                this.cancelQuestionForm();
+              });
+            } else {
+              this.loadSurvey(this.survey!.id!);
+              this.cancelQuestionForm();
+            }
+          });
         },
-        error: (err) => console.error('❌ Erreur mise à jour:', err)
+        error: (err) => {
+          console.error('❌ Erreur mise à jour:', err);
+          this.alertService.showError('Erreur', 'Erreur lors de la mise à jour de la question');
+        }
       });
     } else {
-      // 🔥 CRÉATION - AJOUTER CETTE PARTIE
+      // 🔥 CRÉATION
       this.http.post('/api/question', questionData).subscribe({
         next: (newQuestion: any) => {
-          console.log('✅ Question créée:', newQuestion);
           const questionId = newQuestion.id;
           
-          // 1. Sauvegarder les réponses si nécessaire
           if (needsAnswers && answers.length > 0) {
             this.saveAnswersForQuestion(questionId, answers, () => {
-              // 2. Créer la liaison section_question
               this.createSectionQuestion(questionId);
             });
           } else {
-            // 2. Créer la liaison section_question
             this.createSectionQuestion(questionId);
           }
         },
         error: (err) => {
           console.error('❌ Erreur création question:', err);
-          alert('Erreur lors de la création de la question');
+          this.alertService.showError('Erreur', 'Erreur lors de la création de la question');
         }
       });
     }
-  } else {
-    console.log('❌ Formulaire invalide ou section non sélectionnée');
-    console.log('Form valid:', this.questionForm.valid);
-    console.log('selectedSection:', this.selectedSection);
-    console.log('survey:', this.survey);
   }
 }
 
 
 deleteAnswersForQuestion(questionId: number, callback: () => void): void {
-  console.log('🔍 === SUPPRESSION DES ANCIENNES RÉPONSES ===');
-  console.log('🔍 Question ID:', questionId);
+  console.log('🔍 Suppression des anciennes réponses pour la question:', questionId);
   
-  // Vérifier que l'URL est correcte
-  const url = `/api/questionAnswers/question/${questionId}`;
-  console.log('🔍 URL appelée:', url);
-  
-  this.http.delete(url).subscribe({
+  // ✅ Utiliser directement le DELETE existant (pas besoin de GET)
+  this.http.delete(`/api/questionAnswers/question/${questionId}`).subscribe({
     next: () => {
-      console.log('✅ Toutes les anciennes réponses supprimées');
+      console.log('✅ Réponses supprimées avec succès');
       callback();
     },
     error: (err) => {
-      console.error('❌ Erreur suppression des réponses:', err);
-      console.error('❌ Statut:', err.status);
-      console.error('❌ Message:', err.message);
-      callback(); // Continuer même en cas d'erreur
+      console.error('❌ Erreur lors de la suppression:', err);
+      // Continuer quand même (peut-être qu'il n'y avait pas de réponses)
+      callback();
     }
   });
 }
@@ -464,7 +497,13 @@ deleteAnswersForQuestion(questionId: number, callback: () => void): void {
 
 
 saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void): void {
-  if (!questionId || answers.length === 0) {
+  if (!questionId) {
+    console.error('❌ ID de question invalide');
+    callback();
+    return;
+  }
+  
+  if (answers.length === 0) {
     callback();
     return;
   }
@@ -473,38 +512,61 @@ saveAnswersForQuestion(questionId: number, answers: any[], callback: () => void)
   const total = answers.length;
   const today = new Date().toISOString().split('T')[0];
   
+  console.log(`📝 Sauvegarde de ${total} réponse(s) pour la question ${questionId}`);
+  
   answers.forEach((answer, index) => {
+    // 🔥 CRÉER NmAnswers D'ABORD
     const nmAnswersData = {
-      code: answer.code || '',
+      code: answer.code || `ANS_${Date.now()}_${index}`,
       libelle: answer.libelle,
       libelleEn: answer.libelleEn || '',
       reference: answer.reference || '',
       dtUpdate: today
     };
     
+    console.log(`📤 [${index + 1}/${total}] Création NmAnswers:`, nmAnswersData);
+    
     this.http.post('/api/nmAnswers', nmAnswersData).subscribe({
       next: (nmAnswer: any) => {
         const nmAnswerId = nmAnswer.id;
         
+        if (!nmAnswerId) {
+          console.error(`❌ [${index + 1}/${total}] Pas d'ID retourné`);
+          completed++;
+          if (completed === total) callback();
+          return;
+        }
+        
+        console.log(`✅ [${index + 1}/${total}] NmAnswers créée, ID: ${nmAnswerId}`);
+        
+        // 🔥 CRÉER QuestionAnswers APRÈS, avec l'ID du NmAnswers
         const questionAnswersData = {
           isConditionnel: false,
           dtUpdate: today,
           question: { id: questionId },
-          nmAnswers: { id: nmAnswerId }
+          nmAnswers: { id: nmAnswerId }  // ← Utiliser l'objet avec l'ID seulement
         };
+        
+        console.log(`📤 [${index + 1}/${total}] Création QuestionAnswers:`, questionAnswersData);
         
         this.http.post('/api/questionAnswers', questionAnswersData).subscribe({
           next: () => {
             completed++;
-            if (completed === total) callback();
+            console.log(`✅ [${index + 1}/${total}] Réponse sauvegardée (${completed}/${total})`);
+            if (completed === total) {
+              console.log('🎯 Toutes les réponses sauvegardées');
+              callback();
+            }
           },
-          error: () => {
+          error: (err) => {
+            console.error(`❌ [${index + 1}/${total}] Erreur QuestionAnswers:`, err);
             completed++;
             if (completed === total) callback();
           }
         });
       },
-      error: () => {
+      error: (err) => {
+        console.error(`❌ [${index + 1}/${total}] Erreur création NmAnswers:`, err);
         completed++;
         if (completed === total) callback();
       }
@@ -576,17 +638,76 @@ private createQuestionAnswer(questionId: number, nmAnswerId: number, today: stri
 }
 
 
-  deleteQuestion(questionId: number): void {
-    if (confirm('Supprimer cette question ?') && this.survey) {
-      this.http.delete(`/api/question/${questionId}`).subscribe({
-        next: () => {
-          this.loadSurvey(this.survey!.id!);
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Erreur suppression question:', err)
-      });
+  async deleteQuestion(questionId: number): Promise<void> {
+  // Rechercher la question dans toutes les sections et sous-sections
+  let questionTitle = '';
+  let found = false;
+  
+  for (const section of this.sections) {
+    // Chercher dans les questions de la section principale
+    if (section.questions) {
+      const q = section.questions.find(q => q.id === questionId);
+      if (q) {
+        questionTitle = q.titleFr;
+        found = true;
+        break;
+      }
+    }
+    
+    // Chercher dans les sous-sections
+    if (section.children) {
+      for (const child of section.children) {
+        if (child.questions) {
+          const q = child.questions.find(q => q.id === questionId);
+          if (q) {
+            questionTitle = q.titleFr;
+            found = true;
+            break;
+          }
+        }
+      }
+      if (found) break;
     }
   }
+  
+  // 🔥 Confirmation
+  const confirmed = await this.confirmService.show({
+    title: '🗑️ Confirmation de suppression',
+    message: `Supprimer la question "${questionTitle || '#' + questionId}" ?\n\n⚠️ Attention : Toutes les réponses associées seront également supprimées. Cette action est définitive.`,
+    confirmText: 'Oui, supprimer',
+    cancelText: 'Non, annuler',
+    type: 'danger'
+  });
+  
+  if (!confirmed) {
+    this.alertService.showInfo('Annulé', 'La suppression a été annulée.');
+    return;
+  }
+  
+  if (!this.survey) return;
+  
+  this.loading = true;
+  
+  this.http.delete(`/api/question/${questionId}`).subscribe({
+    next: () => {
+      this.alertService.showSuccess(
+        '✓ Question supprimée', 
+        `La question "${questionTitle || '#' + questionId}" a été supprimée avec succès.`
+      );
+      this.loadSurvey(this.survey!.id!);
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('Erreur suppression question:', err);
+      this.alertService.showError(
+        '✗ Erreur', 
+        err.error?.message || 'Une erreur est survenue lors de la suppression de la question.'
+      );
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   getQuestionTypeLabel(typeId: number): string {
     console.log('getQuestionTypeLabel called with typeId:', typeId);

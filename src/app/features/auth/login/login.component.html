@@ -1,4 +1,4 @@
-<!-- src/app/features/auth/login/login.component.html -->
+
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-4">
@@ -8,6 +8,7 @@
             <i class="bi bi-box-arrow-in-right me-2"></i>
             Connexion
           </h3>
+          <small class="text-white-50">Application web d'administration</small>
         </div>
         <div class="card-body p-4">
           <div *ngIf="error" class="alert alert-danger">
@@ -19,14 +20,12 @@
             <div class="mb-3">
               <label class="form-label fw-semibold">
                 <i class="bi bi-person me-1 text-orange"></i>
-                Nom d'utilisateur / Email / Téléphone
+                Nom d'utilisateur
               </label>
               <input type="text" 
                      class="form-control" 
-                     [class.is-invalid]="loginForm.get('login')?.invalid && loginForm.get('login')?.touched"
                      formControlName="login"
-                     placeholder="Ex: admin / admin@example.com / 0612345678">
-              <div class="invalid-feedback">Ce champ est requis</div>
+                     placeholder="Entrez votre nom d'utilisateur">
             </div>
             
             <div class="mb-4">
@@ -36,10 +35,8 @@
               </label>
               <input type="password" 
                      class="form-control"
-                     [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
                      formControlName="password"
-                     placeholder="Votre mot de passe">
-              <div class="invalid-feedback">Ce champ est requis</div>
+                     placeholder="Entrez votre mot de passe">
             </div>
             
             <button type="submit" class="btn btn-orange w-100 py-2" [disabled]="loginForm.invalid || loading">
@@ -51,8 +48,8 @@
           
           <div class="text-center mt-3">
             <small class="text-muted">
-              Pas encore de compte ? 
-              <a routerLink="/register" class="text-orange text-decoration-none">S'inscrire</a>
+              <i class="bi bi-shield-lock me-1"></i>
+              Accès réservé aux administrateurs
             </small>
           </div>
         </div>

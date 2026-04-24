@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';  
+import { ConfirmService } from '../../../core/services/confirm.service';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'app-survey-list',
@@ -33,7 +35,9 @@ export class SurveyListComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private alertService: AlertService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -141,18 +145,32 @@ export class SurveyListComponent implements OnInit {
     return this.surveys.filter(s => s.formReference === true).length;
   }
 
-  deleteSurvey(id: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce survey ?')) {
-      this.http.delete(`/api/survey/${id}`).subscribe({
-        next: () => {
-          console.log('Survey supprimé:', id);
-          this.loadSurveys();
-        },
-        error: (err) => {
-          console.error('Erreur suppression:', err);
-          alert('Erreur lors de la suppression');
-        }
-      });
+
+async deleteSurvey(id: number): Promise<void> {
+  const survey = this.surveys.find(s => s.id === id);
+  
+  // 🔥 Confirmation avant suppression
+  const confirmed = await this.confirmService.show({
+    title: 'Confirmation de suppression',
+    message: `Êtes-vous sûr de vouloir supprimer le survey "${survey?.libelle}" ? Toutes les sections et questions associées seront également supprimées.`,
+    confirmText: 'Supprimer',
+    cancelText: 'Annuler',
+    type: 'danger'
+  });
+  
+  if (!confirmed) return;
+  
+  this.http.delete(`/api/survey/${id}`).subscribe({
+    next: () => {
+      this.alertService.showSuccess(
+        'Survey supprimé', 
+        `Le survey "${survey?.libelle}" a été supprimé avec succès.`
+      );
+      this.loadSurveys();
+    },
+    error: (err) => {
+      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression');
     }
-  }
+  });
+}
 }

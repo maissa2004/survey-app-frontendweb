@@ -1,9 +1,10 @@
 // src/app/core/services/auth.service.ts
+
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 
 export interface LoginRequest {
   login: string;
@@ -51,38 +52,39 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-  console.log('📤 Envoi de la requête:', credentials);
-  console.log('📤 Body JSON:', JSON.stringify(credentials));
-  
-  return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
-    .pipe(
-      tap(response => {
-        console.log('✅ Réponse reçue:', response);
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('currentUser', JSON.stringify(response));
-        this.currentUserSubject.next(response);
-      }),
-      catchError(error => {
-        console.error('❌ Erreur complète:', error);
-        console.error('❌ Status:', error.status);
-        console.error('❌ Message:', error.message);
-        if (error.error) {
-          console.error('❌ Détail backend:', error.error);
-        }
-        throw error;
-      })
-    );
-}
-
-  register(user: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, user)
-      .pipe(tap(response => {
-        if (this.isBrowser) {
+    console.log('📤 Envoi de la requête:', credentials);
+    
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap(response => {
+          console.log('✅ Réponse reçue:', response);
           localStorage.setItem('token', response.token);
           localStorage.setItem('currentUser', JSON.stringify(response));
-        }
-        this.currentUserSubject.next(response);
-      }));
+          this.currentUserSubject.next(response);
+        }),
+        catchError(error => {
+          console.error('❌ Erreur:', error);
+          throw error;
+        })
+      );
+  }
+
+  // 🔥 NOUVEAU : Vérifier si c'est le super admin
+  isSuperAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.username === 'admin' && user?.role === 'admin';
+  }
+
+  // 🔥 NOUVEAU : Vérifier si c'est un admin normal
+  isNormalAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'admin' && user?.username !== 'admin';
+  }
+
+  // 🔥 NOUVEAU : Vérifier si c'est un enquêteur
+  isEnqueteur(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'enqueteur';
   }
 
   logout(): void {
@@ -114,5 +116,16 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'admin';
+  }
+
+  // 🔥 NOUVEAU : Redirection en fonction du rôle
+  getRedirectUrl(): string {
+    if (this.isSuperAdmin()) {
+      return '/user-management';
+    }
+    if (this.isNormalAdmin()) {
+      return '/surveys';
+    }
+    return '/login';
   }
 }

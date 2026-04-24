@@ -22,6 +22,17 @@ export class HeaderComponent {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
+// 🔥 Redirection du logo en fonction du rôle
+  getHomeLink(): string {
+    if (this.authService.isSuperAdmin()) {
+      return '/user-management';
+    }
+    if (this.authService.isNormalAdmin()) {
+      return '/surveys';
+    }
+    return '/login';
+  }
+
   logout(): void {
     if (this.isBrowser) {
       this.authService.logout();

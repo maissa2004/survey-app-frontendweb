@@ -2,6 +2,32 @@
    STYLES GLOBAUX
    ============================================ */
 
+
+   /* survey-list.component.css - Ajouter */
+
+/* Animation de suppression */
+.survey-row {
+  transition: all 0.3s ease;
+}
+
+.survey-row.deleting {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* Bouton suppression amélioré */
+.btn-delete {
+  background: #ffe8e8;
+  color: #dc3545;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
 /* Header glassmorphism */
 .header-glass {
   background: rgba(255, 255, 255, 0.95);

@@ -375,6 +375,22 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Badge de confirmation */
+.confirm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fff3e8;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.session-card.deleting {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
 .session-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);

@@ -63,7 +63,8 @@ export interface Section {
   dtUpdate?: Date;
   questions?: Question[];
   parentAnswerId?: number;
-  children?: Section[];  // ← Seulement pour l'affichage frontend, pas dans la base
+  children?: Section[]; 
+  idReferencedForm?: number; 
 }
 
 export interface Survey {

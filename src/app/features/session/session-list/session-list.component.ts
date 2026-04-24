@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { SessionEnqueteurService, SessionEnqueteur, User } from '../../../core/services/session-enqueteur.service';
+import { AlertService } from '../../../core/services/alert.service';
+import { ConfirmService } from '../../../core/services/confirm.service';
 
 interface SurveyInfo {
   id: number;
@@ -70,7 +72,9 @@ export class SessionListComponent implements OnInit {
     private http: HttpClient, 
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private sessionEnqueteurService: SessionEnqueteurService
+    private sessionEnqueteurService: SessionEnqueteurService,
+    private alertService: AlertService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -365,27 +369,88 @@ extractEnqueteurs(): void {
   }
 
   activateSession(id: number): void {
-    this.http.post(`/api/sessions/${id}/activate`, {}).subscribe({
-      next: () => this.loadSessions(),
-      error: (err) => console.error('Erreur activation:', err)
-    });
-  }
-
-  deactivateSession(id: number): void {
-    this.http.post(`/api/sessions/${id}/deactivate`, {}).subscribe({
-      next: () => this.loadSessions(),
-      error: (err) => console.error('Erreur désactivation:', err)
-    });
-  }
-
-  deleteSession(id: number): void {
-    if (confirm('Supprimer cette session ?')) {
-      this.http.delete(`/api/sessions/${id}`).subscribe({
-        next: () => this.loadSessions(),
-        error: (err) => console.error('Erreur suppression:', err)
-      });
+  const session = this.sessions.find(s => s.id === id);
+  
+  this.http.post(`/api/sessions/${id}/activate`, {}).subscribe({
+    next: () => {
+      this.alertService.showSuccess(
+        'Session activée', 
+        `La session "${session?.intitule}" a été activée avec succès.`
+      );
+      this.loadSessions();
+    },
+    error: (err) => {
+      this.alertService.showError('Erreur', 'Impossible d\'activer la session');
     }
+  });
+}
+
+deactivateSession(id: number): void {
+  const session = this.sessions.find(s => s.id === id);
+  
+  this.http.post(`/api/sessions/${id}/deactivate`, {}).subscribe({
+    next: () => {
+      this.alertService.showSuccess(
+        'Session désactivée', 
+        `La session "${session?.intitule}" a été désactivée avec succès.`
+      );
+      this.loadSessions();
+    },
+    error: (err) => {
+      this.alertService.showError('Erreur', 'Impossible de désactiver la session');
+    }
+  });
+}
+
+  async deleteSession(id: number): Promise<void> {
+  // Trouver la session pour afficher son nom
+  const session = this.sessions.find(s => s.id === id);
+  
+  if (!session) {
+    this.alertService.showError('Erreur', 'Session non trouvée');
+    return;
   }
+  
+  // Compter le nombre de surveys associés
+  const surveysCount = session.surveys?.length || 0;
+  const enqueteursCount = session.surveys?.reduce((total, survey) => 
+    total + (survey.enqueteurs?.length || 0), 0) || 0;
+  
+  // 🔥 CONFIRMATION AVANT SUPPRESSION
+  const confirmed = await this.confirmService.show({
+    title: '🗑️ Confirmation de suppression',
+    message: `Supprimer la session "${session.intitule}" ?\n\n` +
+             `📊 Résumé :\n` +
+             `• ${surveysCount} formulaire(s) associé(s)\n` +
+             `• ${enqueteursCount} enquêteur(s) affecté(s)\n\n` +
+             `⚠️ Cette action est irréversible. Toutes les données associées seront supprimées.`,
+    confirmText: 'Oui, supprimer',
+    cancelText: 'Non, annuler',
+    type: 'danger'
+  });
+  
+  if (!confirmed) {
+    this.alertService.showInfo('Annulé', 'La suppression a été annulée.');
+    return;
+  }
+  
+  this.http.delete(`/api/sessions/${id}`).subscribe({
+    next: () => {
+      this.alertService.showSuccess(
+        '✓ Session supprimée', 
+        `La session "${session.intitule}" a été supprimée avec succès.`
+      );
+      this.loadSessions();
+    },
+    error: (err) => {
+      console.error('Erreur suppression:', err);
+      this.alertService.showError(
+        '✗ Erreur', 
+        err.error?.message || 'Une erreur est survenue lors de la suppression de la session.'
+      );
+    }
+  });
+}
 
   openEnqueteurModal(sessionSurveyId: number, surveyName: string): void {
     this.selectedSessionSurveyId = sessionSurveyId;

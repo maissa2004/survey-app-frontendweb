@@ -1,8 +1,9 @@
 // src/app/features/auth/login/login.component.ts
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -16,20 +17,16 @@ export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
   error: string | null = null;
-  returnUrl: string = '/surveys';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       login: ['', Validators.required],
       password: ['', Validators.required]
     });
-    
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/surveys';
   }
 
   onSubmit(): void {
@@ -39,11 +36,32 @@ export class LoginComponent {
     this.error = null;
     
     this.authService.login(this.loginForm.value).subscribe({
-      next: () => {
-        this.router.navigate([this.returnUrl]);
+      next: (response) => {
+        console.log('Login réussi:', response);
+        
+        // 🔥 Vérifier le type d'utilisateur
+        if (this.authService.isSuperAdmin()) {
+          // Super admin (admin/admin123) -> interface gestion users
+          this.router.navigate(['/user-management']);
+        } 
+        else if (this.authService.isNormalAdmin()) {
+          // Admins normaux -> interface surveys/sessions
+          this.router.navigate(['/surveys']);
+        } 
+        else if (this.authService.isEnqueteur()) {
+          // 🔥 ENQUÊTEUR - ACCÈS REFUSÉ
+          this.error = '❌ Accès refusé : Les enquêteurs ne peuvent pas accéder à l\'application web.';
+          this.authService.logout();
+          this.loading = false;
+        } 
+        else {
+          this.error = 'Rôle non autorisé';
+          this.authService.logout();
+          this.loading = false;
+        }
       },
       error: (err) => {
-        this.error = err.error || 'Erreur de connexion';
+        this.error = err.error || 'Identifiants incorrects';
         this.loading = false;
       }
     });
