@@ -85,29 +85,45 @@
             </div>
           </div>
 
-          <!-- Surveys (sélection multiple) -->
-          <div class="col-md-12">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-file-earmark-text me-1 text-orange"></i>
-              Formulaire(s) (Survey) <span class="text-orange">*</span>
-            </label>
-            <select class="form-select" 
-                    multiple
-                    size="4"
-                    [class.is-invalid]="sessionForm.get('idSurveys')?.invalid && sessionForm.get('idSurveys')?.touched"
-                    formControlName="idSurveys">
-              <option *ngFor="let survey of surveys" [value]="survey.id">
-                {{ survey.code }} - {{ survey.libelle }}
-              </option>
-            </select>
-            <small class="text-muted">
-              <i class="bi bi-info-circle me-1"></i>
-              Maintenez Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs surveys
-            </small>
-            <div class="invalid-feedback" *ngIf="sessionForm.get('idSurveys')?.invalid && sessionForm.get('idSurveys')?.touched">
-              Au moins un survey est requis
-            </div>
-          </div>
+          <!-- 🔥 SURVEYS AVEC CHECKBOXES ET INDICATEUR DE CHARGEMENT -->
+<div class="col-md-12">
+  <label class="form-label fw-semibold">
+    <i class="bi bi-file-earmark-text me-1 text-orange"></i>
+    Formulaire(s) (Survey) <span class="text-orange">*</span>
+  </label>
+  
+  <!-- Indicateur de chargement -->
+  <div *ngIf="loadingSurveys" class="text-center py-3">
+    <div class="spinner-border spinner-border-sm text-orange me-2" role="status"></div>
+    <span class="text-muted">Chargement des surveys...</span>
+  </div>
+  
+  <!-- Liste des surveys -->
+  <div *ngIf="!loadingSurveys" class="border rounded-3 p-3 bg-light" style="max-height: 300px; overflow-y: auto;">
+    <div *ngIf="surveys.length === 0" class="text-center py-3 text-muted">
+      <i class="bi bi-inbox me-2"></i> Aucun survey disponible
+    </div>
+    <div *ngFor="let survey of surveys" class="form-check mb-2">
+      <input 
+        type="checkbox" 
+        class="form-check-input" 
+        [id]="'survey_' + survey.id"
+        [value]="survey.id"
+        (change)="onSurveyCheckboxChange($event, survey.id)"
+        [checked]="isSurveySelected(survey.id)"
+        [disabled]="loading">
+      <label class="form-check-label" [for]="'survey_' + survey.id">
+        <strong>{{ survey.code }}</strong> - {{ survey.libelle }}
+      </label>
+    </div>
+  </div>
+  
+  <!-- Affichage du nombre de surveys sélectionnés -->
+  <small class="text-muted mt-2 d-block" *ngIf="!loadingSurveys">
+    <i class="bi bi-info-circle me-1"></i>
+    {{ getSelectedSurveyCount() }} formulaire(s) sélectionné(s)
+  </small>
+</div>
         </div>
 
         <!-- Boutons -->

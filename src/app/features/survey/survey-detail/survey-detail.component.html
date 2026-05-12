@@ -13,15 +13,15 @@
     <div class="card-body bg-white">
       <div class="row">
         <div class="col-md-6">
-  <p class="mb-2">
-    <i class="bi bi-info-circle me-2 text-orange"></i>
-    <strong>Statut:</strong> 
-    <span class="badge" [class.bg-orange]="survey?.idEtatSurvey === 1" [class.bg-secondary]="survey?.idEtatSurvey !== 1">
-  <i class="bi" [class.bi-check-circle]="survey?.idEtatSurvey === 1" [class.bi-x-circle]="survey?.idEtatSurvey !== 1"></i>
-  {{ survey?.idEtatSurvey === 1 ? 'Actif' : 'Inactif' }}
-</span>
-  </p>
-</div>
+          <p class="mb-2">
+            <i class="bi bi-info-circle me-2 text-orange"></i>
+            <strong>Statut:</strong> 
+            <span class="badge" [class.bg-orange]="survey?.idEtatSurvey === 1" [class.bg-secondary]="survey?.idEtatSurvey !== 1">
+              <i class="bi" [class.bi-check-circle]="survey?.idEtatSurvey === 1" [class.bi-x-circle]="survey?.idEtatSurvey !== 1"></i>
+              {{ survey?.idEtatSurvey === 1 ? 'Actif' : 'Inactif' }}
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@
             <input type="number" class="form-control" formControlName="ordre">
           </div>
         </div>
-        <div class="d-flex gap-2 mt-4">
+        <div class="d-flex justify-content-end gap-2 mt-4">
           <button type="submit" class="btn btn-navy" [disabled]="sectionForm.invalid">
             <i class="bi" [class.bi-check-lg]="editingSection" [class.bi-plus-lg]="!editingSection"></i>
             {{ editingSection ? 'Mettre à jour' : 'Ajouter' }}
@@ -157,25 +157,29 @@
               <form [formGroup]="subSectionForm" (ngSubmit)="addSubSection()">
                 <div class="row g-2">
                   <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" formControlName="code" placeholder="Code *">
+                    <label class="form-label fw-semibold small">Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" formControlName="code" placeholder="Ex: SUB_SEC_001">
                   </div>
                   <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" formControlName="title" placeholder="Titre FR *">
+                    <label class="form-label fw-semibold small">Titre FR <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" formControlName="title" placeholder="Ex: Détails personnels">
                   </div>
                   <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm" formControlName="titleEn" placeholder="Titre EN">
+                    <label class="form-label fw-semibold small">Titre EN</label>
+                    <input type="text" class="form-control form-control-sm" formControlName="titleEn" placeholder="Ex: Personal details">
                   </div>
                   <div class="col-md-2">
-                    <input type="number" class="form-control form-control-sm" formControlName="ordre" placeholder="Ordre">
+                    <label class="form-label fw-semibold small">Ordre</label>
+                    <input type="number" class="form-control form-control-sm" formControlName="ordre" placeholder="Ex: 1">
                   </div>
-                  <div class="col-md-1 d-flex align-items-center">
-                    <div class="form-check">
-                      <input type="checkbox" class="form-check-input" formControlName="conditionnel">
-                      <label class="form-check-label small">Cond.</label>
+                  <div class="col-md-1 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                      <input type="checkbox" class="form-check-input" formControlName="conditionnel" id="subSectionConditionnel">
+                      <label class="form-check-label small" for="subSectionConditionnel">Cond.</label>
                     </div>
                   </div>
                 </div>
-                <div class="d-flex gap-2 justify-content-end mt-2">
+                <div class="d-flex gap-2 justify-content-end mt-3">
                   <button type="submit" class="btn btn-sm btn-navy" [disabled]="subSectionForm.invalid">
                     <i class="bi bi-check-lg"></i> Ajouter
                   </button>
@@ -218,6 +222,9 @@
                         <i class="bi bi-check-circle-fill text-orange me-1" style="font-size: 10px;"></i>
                         {{ answer.libelle }}
                         <span *ngIf="answer.libelleEn" class="text-muted ms-1">({{ answer.libelleEn }})</span>
+                        <span *ngIf="hasConditions(answer)" class="ms-1 text-info" title="Cette réponse déclenche des conditions">
+                          <i class="bi bi-diagram-3"></i>
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -227,10 +234,10 @@
                     <i class="bi bi-pencil"></i>
                   </button>
                   <button class="btn btn-sm btn-outline-danger" 
-        (click)="deleteQuestion(question.id!)" 
-        title="Supprimer">
-  <i class="bi bi-trash"></i>
-</button>
+                    (click)="deleteQuestion(question.id!)" 
+                    title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -290,6 +297,9 @@
                         <div *ngIf="question.answers && question.answers.length > 0" class="mt-1">
                           <span *ngFor="let answer of question.answers" class="badge bg-navy-light text-navy border rounded-pill me-1 px-2 py-1">
                             <i class="bi bi-check-circle-fill text-orange me-1"></i>{{ answer.libelle }}
+                            <span *ngIf="hasConditions(answer)" class="ms-1 text-info" title="Cette réponse déclenche des conditions">
+                              <i class="bi bi-diagram-3"></i>
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -323,7 +333,7 @@
 
   <!-- Modal Formulaire question -->
   <div class="modal fade" [class.show]="showQuestionForm" [style.display]="showQuestionForm ? 'block' : 'none'" style="background-color: rgba(0,0,0,0.5)" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
       <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-navy text-white border-0">
           <h5 class="modal-title fw-semibold">
@@ -388,53 +398,128 @@
               </div>
             </div>
 
-            <!-- Section des réponses -->
-            <div class="card mt-4 border-0 bg-navy-light" *ngIf="questionForm.get('id_nm_type_quest')?.value && requiresAnswers(questionForm.get('id_nm_type_quest')?.value)">
-              <div class="card-header bg-white border-0">
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong class="text-navy">
-                    <i class="bi bi-list-check me-1"></i>Réponses possibles
-                  </strong>
-                  <button type="button" class="btn btn-sm btn-orange" (click)="addAnswer()">
-                    <i class="bi bi-plus-circle me-1"></i> Ajouter
-                  </button>
-                </div>
-                <small class="text-muted">Ces réponses seront affichées comme options de choix</small>
-              </div>
-              <div class="card-body">
-                <div class="alert alert-orange-light" *ngIf="getAnswersArray().length === 0">
-                  <i class="bi bi-info-circle me-1"></i> Aucune réponse définie
-                </div>
-                
-                <div formArrayName="answers">
-                  <div *ngFor="let answer of getAnswersArray().controls; let i = index" 
-                       [formGroupName]="i" class="border rounded-3 p-3 mb-3 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div class="fw-semibold text-navy">
-                        <i class="bi bi-quote me-1"></i>Réponse {{ i + 1 }}
-                      </div>
-                      <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAnswer(i)">
-                        <i class="bi bi-trash me-1"></i> Supprimer
-                      </button>
-                    </div>
-                    <div class="row g-2">
-                      <div class="col-md-3">
-                        <input type="text" class="form-control form-control-sm" formControlName="code" placeholder="Code">
-                      </div>
-                      <div class="col-md-4">
-                        <input type="text" class="form-control form-control-sm" formControlName="libelle" placeholder="Libellé FR *">
-                      </div>
-                      <div class="col-md-3">
-                        <input type="text" class="form-control form-control-sm" formControlName="libelleEn" placeholder="Libellé EN">
-                      </div>
-                      <div class="col-md-2">
-                        <input type="text" class="form-control form-control-sm" formControlName="reference" placeholder="Référence">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <!-- Section des réponses avec gestion des conditions -->
+<div class="card mt-4 border-0 bg-navy-light" *ngIf="questionForm.get('id_nm_type_quest')?.value && requiresAnswers(questionForm.get('id_nm_type_quest')?.value)">
+  <div class="card-header bg-white border-0">
+    <div class="d-flex justify-content-between align-items-center">
+      <strong class="text-navy">
+        <i class="bi bi-list-check me-1"></i>Réponses possibles
+      </strong>
+      <button type="button" class="btn btn-sm btn-orange" (click)="addAnswer()">
+        <i class="bi bi-plus-circle me-1"></i> Ajouter
+      </button>
+    </div>
+    <small class="text-muted">Ces réponses seront affichées comme options de choix</small>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-orange-light" *ngIf="getAnswersArray().length === 0">
+      <i class="bi bi-info-circle me-1"></i> Aucune réponse définie
+    </div>
+    
+    <div formArrayName="answers">
+      <div *ngFor="let answer of getAnswersArray().controls; let i = index" 
+           [formGroupName]="i" class="border rounded-3 p-3 mb-3 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="fw-semibold text-navy">
+            <i class="bi bi-quote me-1"></i>Réponse {{ i + 1 }}
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAnswer(i)">
+            <i class="bi bi-trash me-1"></i> Supprimer
+          </button>
+        </div>
+        
+        <!-- 🔥 LIGNES DES TITRES AJOUTÉES -->
+        <div class="row g-2 mb-1">
+          <div class="col-md-3">
+            <label class="form-label fw-semibold small text-muted">Code</label>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-semibold small text-muted">Libellé FR <span class="text-danger">*</span></label>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold small text-muted">Libellé EN</label>
+          </div>
+        </div>
+        
+        <!-- 🔥 CHAMPS DU FORMULAIRE -->
+        <div class="row g-2">
+          <div class="col-md-3">
+            <input type="text" class="form-control form-control-sm" formControlName="code" placeholder="Ex: ANS_001">
+          </div>
+          <div class="col-md-5">
+            <input type="text" class="form-control form-control-sm" formControlName="libelle" placeholder="Ex: Oui">
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control form-control-sm" formControlName="libelleEn" placeholder="Ex: Yes">
+          </div>
+        </div>
+        
+        <!-- SECTION GESTION DES CONDITIONS POUR CETTE RÉPONSE -->
+        <div class="mt-3 pt-2 border-top">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <small class="fw-bold text-navy">
+              <i class="bi bi-diagram-3 me-1 text-orange"></i>
+              Conditions (cette réponse déclenche l'affichage de:)
+            </small>
+          </div>
+          
+          <!-- Questions conditionnelles existantes -->
+          <div *ngIf="answer.value.condiQuestion && answer.value.condiQuestion.length > 0" class="mb-2">
+            <div class="d-flex flex-wrap gap-1">
+              <span *ngFor="let q of answer.value.condiQuestion" class="badge bg-info text-white d-inline-flex align-items-center gap-1">
+                <i class="bi bi-question-circle"></i>
+                {{ q.titleFr }}
+                <i class="bi bi-x-circle ms-1" style="cursor: pointer; font-size: 10px;" 
+                   (click)="removeConditionFromAnswer(i, 'question', q.id!)"></i>
+              </span>
             </div>
+          </div>
+          
+          <!-- Sections conditionnelles existantes -->
+          <div *ngIf="answer.value.condiSections && answer.value.condiSections.length > 0" class="mb-2">
+            <div class="d-flex flex-wrap gap-1">
+              <span *ngFor="let s of answer.value.condiSections" class="badge bg-warning text-dark d-inline-flex align-items-center gap-1">
+                <i class="bi bi-folder"></i>
+                {{ s.title }}
+                <i class="bi bi-x-circle ms-1" style="cursor: pointer; font-size: 10px;" 
+                   (click)="removeConditionFromAnswer(i, 'section', s.id!)"></i>
+              </span>
+            </div>
+          </div>
+          
+          <!-- Ajouter une nouvelle condition -->
+          <div class="row g-1 mt-1">
+            <div class="col-4">
+              <select class="form-select form-select-sm" #conditionTypeSelect (change)="onConditionTypeChange(i, conditionTypeSelect.value)">
+                <option value="">-- Type --</option>
+                <option value="question">+ Question conditionnelle</option>
+                <option value="section">+ Section conditionnelle</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <select class="form-select form-select-sm" #conditionItemSelect (change)="onConditionItemChange(i, conditionItemSelect.value)" [disabled]="!tempConditionType[i]">
+                <option value="">-- Sélectionner --</option>
+                <option *ngFor="let q of getAvailableQuestionsForCondition(answer.value)" [value]="q.id">
+                  📄 {{ q.titleFr }} ({{ q.code }})
+                </option>
+                <option *ngFor="let s of getAvailableSectionsForCondition()" [value]="s.id">
+                  📁 {{ s.title }} ({{ s.code }})
+                </option>
+              </select>
+            </div>
+            <div class="col-2">
+              <button class="btn btn-sm btn-orange w-100" 
+                      (click)="addConditionToAnswer(i)" 
+                      [disabled]="!tempConditionItemId[i]">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
           </form>
         </div>
         <div class="modal-footer bg-white border-0">
