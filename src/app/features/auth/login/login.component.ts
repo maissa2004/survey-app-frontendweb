@@ -46,7 +46,7 @@ export class LoginComponent {
         } 
         else if (this.authService.isNormalAdmin()) {
           // Admins normaux -> interface surveys/sessions
-          this.router.navigate(['/surveys']);
+          this.router.navigate(['/dashboard']);
         } 
         else if (this.authService.isEnqueteur()) {
           // 🔥 ENQUÊTEUR - ACCÈS REFUSÉ

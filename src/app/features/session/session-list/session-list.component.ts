@@ -380,7 +380,7 @@ extractEnqueteurs(): void {
       this.loadSessions();
     },
     error: (err) => {
-      this.alertService.showError('Erreur', 'Impossible d\'activer la session');
+      this.alertService.showError('Erreur', 'Impossible d\'activer la session', 'vu le dépassement de date de début et de fin de la session');
     }
   });
 }
@@ -397,7 +397,7 @@ deactivateSession(id: number): void {
       this.loadSessions();
     },
     error: (err) => {
-      this.alertService.showError('Erreur', 'Impossible de désactiver la session');
+      this.alertService.showError('Erreur', 'Impossible de désactiver la session','Erreur technique inconnue. Veuillez réessayer.');
     }
   });
 }
@@ -407,7 +407,7 @@ deactivateSession(id: number): void {
   const session = this.sessions.find(s => s.id === id);
   
   if (!session) {
-    this.alertService.showError('Erreur', 'Session non trouvée');
+    this.alertService.showError('Erreur', 'Errer de suppresion vu Session non trouvée');
     return;
   }
   
@@ -446,7 +446,8 @@ deactivateSession(id: number): void {
       console.error('Erreur suppression:', err);
       this.alertService.showError(
         '✗ Erreur', 
-        err.error?.message || 'Une erreur est survenue lors de la suppression de la session.'
+        err.error?.message || 'Une erreur est survenue lors de la suppression. Veuillez réessayer.',
+         err.error?.details
       );
     }
   });

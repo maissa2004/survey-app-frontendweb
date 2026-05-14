@@ -5,6 +5,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
+import { log } from 'console';
 
 export interface LoginRequest {
   login: string;
@@ -79,6 +80,7 @@ export class AuthService {
   isNormalAdmin(): boolean {
     const user = this.getCurrentUser();
     return user?.role === 'admin' && user?.username !== 'admin';
+    console.log('isNormalAdmin:', user?.role === 'admin' && user?.username !== 'admin');
   }
 
   // 🔥 NOUVEAU : Vérifier si c'est un enquêteur

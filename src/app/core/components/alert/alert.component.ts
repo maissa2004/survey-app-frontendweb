@@ -17,12 +17,20 @@ import { AlertService, Alert } from '../../services/alert.service';
         <div class="alert-text">
           <div class="alert-title">{{ alert.title }}</div>
           <div class="alert-message">{{ alert.message }}</div>
+          <div *ngIf="alert.details" class="alert-details-toggle" (click)="toggleDetails()">
+            <i class="bi" [class.bi-chevron-down]="!showDetails" [class.bi-chevron-up]="showDetails"></i>
+            Détails
+          </div>
+          <div *ngIf="showDetails && alert.details" class="alert-details">
+            {{ alert.details }}
+          </div>
         </div>
+        
         <button class="alert-close" (click)="close()">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
-      <div class="alert-progress" [style.animationDuration]="(alert.duration || 3000) + 'ms'"></div>
+      <div class="alert-progress" [style.animationDuration]="(alert.duration || 4000) + 'ms'"></div>
     </div>
   `,
   styles: [`
@@ -71,6 +79,7 @@ import { AlertService, Alert } from '../../services/alert.service';
       font-size: 0.8rem;
       opacity: 0.9;
     }
+     
 
     .alert-close {
       background: none;
@@ -185,12 +194,14 @@ import { AlertService, Alert } from '../../services/alert.service';
 })
 export class AlertComponent implements OnInit {
   alert: Alert | null = null;
-
+  showDetails = false;
+ 
   constructor(private alertService: AlertService) {}
 
   ngOnInit(): void {
     this.alertService.alerts$.subscribe(alert => {
       this.alert = alert;
+      this.showDetails = false;
     });
   }
 
@@ -202,6 +213,10 @@ export class AlertComponent implements OnInit {
       case 'info': return 'bi-info-circle-fill';
       default: return 'bi-info-circle-fill';
     }
+  }
+
+  toggleDetails(): void {
+    this.showDetails = !this.showDetails;
   }
 
   close(): void {

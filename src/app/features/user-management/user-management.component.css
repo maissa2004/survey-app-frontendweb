@@ -24,14 +24,7 @@
   margin-right: 0.5rem;
 }
 /* Header glassmorphism */
-.header-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 31, 63, 0.1);
-}
+
 
 .header-icon {
   width: 60px;
@@ -94,7 +87,7 @@
 
 .stat-total { background: linear-gradient(135deg, #001f3f, #002a5c); color: white; }
 .stat-admin { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-.stat-enqueteur { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+.stat-enqueteur { background: linear-gradient(135deg, #8c898a 0%, #737172 100%); color: white; }
 .stat-active { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
 
 .stat-icon-wrapper {
@@ -121,10 +114,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-.card-glass-header {
-  padding: 1rem 1.5rem;
-  color: white;
-}
+
 
 .bg-gradient-primary {
   background: linear-gradient(135deg, #001f3f, #ff6b35);
@@ -392,7 +382,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   .container-fluid { padding: 1rem; }
-  .header-glass { padding: 1rem; }
   .header-icon { width: 45px; height: 45px; font-size: 22px; }
   .stat-card-modern { padding: 1rem; }
   .stat-value { font-size: 1.5rem; }

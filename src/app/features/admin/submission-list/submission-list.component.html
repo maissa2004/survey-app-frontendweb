@@ -1,0 +1,278 @@
+<div class="submission-container">
+  <!-- En-tête avec dégradé -->
+  <div class="submission-header">
+  <div class="header-content">
+    <div class="header-title">
+      <div class="icon-wrapper">
+        <i class="bi bi-envelope-paper-fill header-icon"></i>
+        <div class="pulse-ring"></div>
+      </div>
+      <div style="margin-left: 0.8 rem;">
+        <h1 class="fw-bold mb-1">Gestion des Réponses</h1>
+        <p class="header-subtitle mb-0">
+          <i class="bi bi-info-circle-fill me-1 text-orange"></i> Consultez et validez les soumissions des enquêteurs
+        </p>
+      </div>
+    </div>
+    <div class="stats-badge">
+      <div class="stats-content">
+        <i class="bi bi-database-fill stats-icon"></i>
+        <div>
+          <span class="stats-label">Total soumissions</span>
+          <span class="stats-value">{{ totalElements }}</span>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <!-- Barre de progression décorative -->
+  <div class="header-progress"></div>
+</div>
+
+  <!-- Filtres -->
+  <div class="row g-4 card filter-card shadow-sm border-0 mb-4">
+    <div class="card-body p-4">
+      <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filtres</h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Survey</label>
+          <select class="form-select" [(ngModel)]="filters.surveyId">
+            <option [value]="null">Tous</option>
+            <option *ngFor="let s of surveys" [value]="s.id">{{ s.libelle }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Enquêteur</label>
+          <select class="form-select" [(ngModel)]="filters.userId">
+            <option [value]="null">Tous</option>
+            <option *ngFor="let u of users" [value]="u.id">{{ u.username }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Statut</label>
+          <select class="form-select" [(ngModel)]="filters.status">
+            <option value="">Tous</option>
+            <option value="EN ATTENTE">En attente</option>
+            <option value="ACCEPTE">Acceptée</option>
+            <option value="REJETE">Rejetée</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Date validation</label>
+          <input type="date" class="form-control" [(ngModel)]="filters.validationDate">
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-primary" (click)="onFilter()" [disabled]="loading">
+            <i class="bi bi-search"></i> Rechercher
+          </button>
+          <button class="btn btn-secondary" (click)="resetFilters()" [disabled]="loading">
+            <i class="bi bi-arrow-repeat"></i> Réinitialiser
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau des soumissions -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <!-- Spinner pendant le chargement -->
+        <div *ngIf="loading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-2 text-muted">Chargement des réponses des enquêtes...</p>
+        </div>
+
+        <!-- Tableau une fois chargé -->
+        <ng-container *ngIf="!loading">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID Soumission</th>
+                <th>Survey</th>
+                <th>Enquêteur</th>
+                <th>Date soumission</th>
+                <th>Validé par</th>
+                <th>Date validation</th>
+                <th>Statut</th>
+                <th>Commentaire</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sub of submissions; trackBy: trackById" [class.table-warning]="sub.status === 'EN ATTENTE'">
+                <td class="fw-semibold">#{{ sub.id }}</td>
+                <td>{{ sub.surveyLibelle || '—' }}</td>
+                <td><i class="bi bi-person-badge me-1"></i>{{ sub.username }}</td>
+                <td>{{ sub.submissionDate | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ sub.validatedByUsername || '-' }}</td>
+                <td>{{ sub.validatedAt | date:'dd/MM/yyyy' }}</td>
+                <td><span [class]="getStatusBadge(sub.status)">{{ getStatusText(sub.status) }}</span></td>
+                <td class="text-truncate" style="max-width: 150px;">{{ sub.validationComment || '-' }}</td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-outline-info rounded-pill px-3" (click)="viewDetail(sub)">
+                    <i class="bi bi-eye me-1"></i> Détail
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="submissions.length === 0">
+                <td colspan="9" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-1"></i>
+                  <p class="mb-0">Aucune soumission trouvée</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Pagination (affichée seulement si nécessaire) -->
+    <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center py-3 px-4 flex-wrap gap-2" *ngIf="totalPages > 0">
+      <div class="text-muted small">
+        <i class="bi bi-bar-chart-steps"></i>
+        Affichage {{ page * size + 1 }}-{{ (page + 1) * size > totalElements ? totalElements : (page + 1) * size }}
+        sur {{ totalElements }} résultat(s)
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-muted small">Page {{ page + 1 }} / {{ totalPages }}</span>
+        <div class="btn-group">
+          <button class="btn btn-outline-secondary btn-sm rounded-pill" (click)="goToPreviousPage()" [disabled]="page === 0">
+            <i class="bi bi-chevron-left"></i> Précédent
+          </button>
+          <button class="btn btn-outline-secondary btn-sm rounded-pill" (click)="goToNextPage()" [disabled]="page + 1 >= totalPages">
+            Suivant <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal moderne (fond flouté, layout amélioré) -->
+<div class="modal fade" [class.show]="showDetailModal" [style.display]="showDetailModal ? 'block' : 'none'" tabindex="-1" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);" *ngIf="showDetailModal">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-gradient-primary text-white">
+        <div>
+          <h5 class="modal-title fw-bold"><i class="bi bi-file-text-fill me-2"></i>Soumission #{{ selectedSubmission?.id }}</h5>
+          <p class="mb-0 text-white-50 small">Détails complets et réponses</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Infos générales -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="info-card">
+              <i class="bi bi-person-circle fs-4 text-primary me-2"></i>
+              <div><strong>Enquêteur :</strong> {{ selectedSubmission?.username }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-card">
+              <i class="bi bi-calendar-event fs-4 text-primary me-2"></i>
+              <div><strong>Date validation :</strong> {{ selectedSubmission?.validatedAt | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-card">
+              <i class="bi bi-check-circle fs-4 text-primary me-2"></i>
+              <div><strong>Statut :</strong> <span [class]="getStatusBadge(selectedSubmission?.status || '')">{{ getStatusText(selectedSubmission?.status || '') }}</span></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-card">
+              <i class="bi bi-chat-text fs-4 text-primary me-2"></i>
+              <div><strong>Commentaire validation :</strong> {{ selectedSubmission?.validationComment || '-' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Onglets Réponses + Export -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="mb-0"><i class="bi bi-receipt"></i> Détail des réponses</h6>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-success" (click)="exportCsv(selectedSubmission!.id)">
+              <i class="bi bi-filetype-csv"></i> CSV
+            </button>
+            <button class="btn btn-outline-info" (click)="exportExcel(selectedSubmission!.id)">
+              <i class="bi bi-file-earmark-excel"></i> Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="answers-list" style="max-height: 400px; overflow-y: auto;">
+          <div *ngFor="let ans of selectedSubmission?.answers; let i = index" class="answer-item card mb-2 p-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-start">
+              <div class="flex-grow-1">
+                <strong class="text-dark">  {{ getQuestionText(ans) }}</strong> 
+              </div>
+            </div>
+            <div class="mt-2 ps-3">
+              <div *ngIf="ans.codeQuestion === 'DATE_RANGE'">
+                <span class="badge bg-secondary me-1">Période</span>
+                {{ formatDateRange(ans) }}
+              </div>
+              <div *ngIf="ans.value && !ans.selectedOptions?.length && !ans.fileName && !ans.codeQuestion.includes('SIGN') && ans.codeQuestion !== 'DATE_RANGE'">
+                <span class="badge bg-secondary me-1">Réponse</span> {{ ans.value }}
+              </div>
+              <div *ngIf="ans.selectedOptions?.length">
+                <span class="badge bg-secondary me-1">Options</span> {{ ans.selectedOptions?.join(', ') }}
+              </div>
+              <!-- BARCODE -->
+              <div *ngIf="ans.codeQuestion === 'BARCODE' && ans.referenceCode">
+                <span class="badge bg-secondary me-1">Code‑barre</span> {{ ans.referenceCode }}
+                <div *ngIf="ans.fileName && ans.fileType?.startsWith('image/')">
+                  <img [src]="getFileUrl(ans.id)" class="img-fluid mt-2 border rounded" style="max-height:100px">
+                </div>
+              </div>
+              <!-- Image / Fichier -->
+              <div *ngIf="ans.fileName && ans.fileType?.startsWith('image/')">
+                <span class="badge bg-secondary me-1">Image</span> {{ ans.fileName }}
+                <img [src]="getFileUrl(ans.id)" class="img-fluid mt-2 border rounded" style="max-height:120px">
+              </div>
+              <div *ngIf="ans.fileName && !ans.fileType?.startsWith('image/')">
+                <span class="badge bg-secondary me-1">Fichier</span>
+                <a (click)="downloadFileFromBase64(ans.value, ans.fileName, ans.fileType)" class="text-primary" style="cursor:pointer">
+                  <i class="bi bi-download"></i> {{ ans.fileName }}
+                </a>
+              </div>
+              <div *ngIf="ans.codeQuestion.includes('SIGN') && ans.value">
+                <span class="badge bg-secondary me-1">Signature</span>
+                <img [src]="'data:image/png;base64,' + ans.value" class="img-fluid border rounded mt-2" style="max-height:80px">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commentaire de validation/rejet -->
+        <div class="mt-4 pt-3 border-top">
+          <div *ngIf="selectedSubmission?.status === 'EN ATTENTE'">
+            <label class="form-label fw-semibold">Commentaire (obligatoire pour rejet)</label>
+              <textarea class="form-control" rows="2" [(ngModel)]="comment" placeholder="Votre commentaire..."></textarea>
+            </div>
+            <div *ngIf="selectedSubmission?.status !== 'EN ATTENTE'">            
+              <label class="form-label fw-semibold">Commentaire avant que l'envoie est {{ selectedSubmission?.status }}</label>
+              <div class="alert alert-secondary mb-0 bg-light border-0">
+                <i class="bi bi-chat-text me-2"></i>
+                {{ selectedSubmission?.validationComment || '-Aucun commentaire-' }}
+              </div>
+            </div>
+        </div>
+
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Fermer</button>
+        <button type="button" class="btn btn-danger" (click)="rejectSingle()" *ngIf="selectedSubmission?.status === 'EN ATTENTE'">
+          <i class="bi bi-x-lg"></i> Rejeter
+        </button>
+        <button type="button" class="btn btn-success" (click)="validateSingle()" *ngIf="selectedSubmission?.status === 'EN ATTENTE'">
+          <i class="bi bi-check-lg"></i> Accepter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

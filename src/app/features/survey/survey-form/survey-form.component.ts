@@ -20,6 +20,8 @@ export class SurveyFormComponent implements OnInit {
   error: string | null = null;
   etatsSurvey: EtatSurvey[] = [];  
   selectedEtatId: number = 1;  
+  alertService: any;
+
 
 
   constructor(
@@ -74,6 +76,8 @@ export class SurveyFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.surveyForm.invalid) {
+      this.alertService.showError('Erreur', 'formulaire invalide', 'formulaire invalide');
+
       console.log('Formulaire invalide');
       return;
     }
@@ -96,6 +100,7 @@ console.log('📤 Envoi survey (DÉTAIL):', JSON.stringify(surveyData, null, 2))
           this.router.navigate(['/surveys']);
         },
         error: (err) => {
+          this.alertService.showError('Erreur', 'Erreur lors de la mise à jour', err.error?.message);
           console.error('Erreur mise à jour:', err);
           alert('Erreur lors de la mise à jour');
         }
@@ -108,6 +113,7 @@ console.log('📤 Envoi survey (DÉTAIL):', JSON.stringify(surveyData, null, 2))
           this.router.navigate(['/surveys']);
         },
         error: (err) => {
+          this.alertService.showError('Erreur', 'Erreur lors de la création', err.error?.message);
           console.error('Erreur création:', err);
           alert('Erreur lors de la création');
         }

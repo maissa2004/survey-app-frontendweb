@@ -276,7 +276,7 @@ idSurvey: this.survey.id
       },
       error: (err) => {
         console.error('❌ Erreur mise à jour section:', err);
-        this.alertService.showError('Erreur', err.error?.message || 'Erreur lors de la mise à jour de la section');
+        this.alertService.showError('Erreur', err.error?.message || 'Erreur lors de la mise à jour de la section', err.error?.details);
       }
     });
   }
@@ -303,7 +303,7 @@ async deleteSection(id: number): Promise<void> {
       this.loadSurvey(this.survey!.id!);
     },
     error: (err) => {
-      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression');
+      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression', err.error?.details);
     }
   });
 }
@@ -450,7 +450,7 @@ async deleteSection(id: number): Promise<void> {
         },
         error: (err) => {
           console.error('❌ Erreur mise à jour:', err);
-          this.alertService.showError('Erreur', 'Erreur lors de la mise à jour de la question');
+          this.alertService.showError('Erreur', 'Erreur lors de la mise à jour de la question', err.error?.message || err.message);
         }
       });
     } else {
@@ -469,7 +469,7 @@ async deleteSection(id: number): Promise<void> {
         },
         error: (err) => {
           console.error('❌ Erreur création question:', err);
-          this.alertService.showError('Erreur', 'Erreur lors de la création de la question');
+          this.alertService.showError('Erreur', 'Erreur lors de la création de la question',err.error?.message);
         }
       });
     }
@@ -701,7 +701,8 @@ private createQuestionAnswer(questionId: number, nmAnswerId: number, today: stri
       console.error('Erreur suppression question:', err);
       this.alertService.showError(
         '✗ Erreur', 
-        err.error?.message || 'Une erreur est survenue lors de la suppression de la question.'
+        err.error?.message || 'Une erreur est survenue lors de la suppression de la question.',
+         err.error?.details
       );
       this.loading = false;
       this.cdr.detectChanges();

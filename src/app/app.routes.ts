@@ -6,6 +6,9 @@ import { SurveyFormComponent } from './features/survey/survey-form/survey-form.c
 import { AuthGuard } from './core/guards/auth.guard';
 import { AdminGuard } from './core/guards/admin.guard';
 import { SuperAdminGuard } from './core/guards/super-admin.guard';
+import { SurveyStatsComponent } from './features/admin/survey-stats/survey-stats.component';
+import { SubmissionListComponent } from './features/admin/submission-list/submission-list.component';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -17,7 +20,7 @@ export const routes: Routes = [
       .then(m => m.LoginComponent)
   },
   
-  // 🔥 Routes Super Admin uniquement
+  // Routes Super Admin uniquement
   { 
     path: 'user-management', 
     loadComponent: () => import('./features/user-management/user-management.component')
@@ -67,6 +70,19 @@ export const routes: Routes = [
       .then(m => m.SessionFormComponent),
     canActivate: [AuthGuard, AdminGuard]
   },
+
+  { path: 'submissions',
+     component: SubmissionListComponent,
+      canActivate: [AuthGuard, AdminGuard] },
+
+  { path: 'stats/:surveyId',
+  component: SurveyStatsComponent,
+   canActivate: [AuthGuard, AdminGuard] },
+
+  { path: 'dashboard', component: AdminDashboardComponent, canActivate: [AuthGuard, AdminGuard] },
+  
+  { path: 'stats/:surveyId', component: SurveyStatsComponent, canActivate: [AuthGuard, AdminGuard] },
+
   
   { path: '**', redirectTo: '/login' }
 ];

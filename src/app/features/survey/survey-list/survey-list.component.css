@@ -8,6 +8,7 @@
 /* Animation de suppression */
 .survey-row {
   transition: all 0.3s ease;
+  
 }
 
 .survey-row.deleting {
@@ -29,14 +30,7 @@
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 /* Header glassmorphism */
-.header-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 31, 63, 0.1);
-}
+
 
 .header-icon {
   width: 60px;
@@ -51,7 +45,7 @@
 }
 
 .btn-gradient {
-  background: linear-gradient(135deg, #001f3f, #ff6b35);
+  background: linear-gradient(135deg, #083562, #ff6b35);
   border: none;
   color: white;
   padding: 0.75rem 1.5rem;
@@ -88,8 +82,8 @@
 
 .stat-total { background: linear-gradient(135deg, #001f3f, #002a5c); color: white; }
 .stat-active { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
-.stat-inactive { background: linear-gradient(135deg, #6c757d, #495057); color: white; }
-.stat-reference { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+.stat-inactive { background: linear-gradient(135deg, #622144, #ef0a28); color: white; }
+.stat-reference { background: linear-gradient(135deg, #6c757d, #495057); color: white; }
 
 .stat-icon-wrapper {
   width: 55px;
@@ -108,7 +102,7 @@
 
 /* ============================================
    SECTION FILTRES
-   ============================================ */
+   ============================================ 
 
 .filters-card {
   background: white;
@@ -118,8 +112,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e9ecef;
 }
-
-.filters-header {
+*/
+/*.filters-header {
   padding: 1rem 1.5rem;
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
@@ -127,9 +121,9 @@
   align-items: center;
   gap: 0.5rem;
   color: #001f3f;
-}
+}*/
 
-.btn-reset {
+/*.btn-reset {
   margin-left: auto;
   background: none;
   border: none;
@@ -141,9 +135,9 @@
 
 .btn-reset:hover {
   text-decoration: underline;
-}
+}*/
 
-.filters-body {
+/*.filters-body {
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-wrap: wrap;
@@ -160,7 +154,7 @@
   position: relative;
   display: flex;
   align-items: center;
-}
+}*/
 
 .filter-input i {
   position: absolute;
@@ -176,6 +170,7 @@
   border-radius: 12px;
   font-size: 0.9rem;
   transition: all 0.2s;
+  
 }
 
 .filter-search:focus {
@@ -184,7 +179,16 @@
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
-.filter-select {
+.filter-card .btn-outline-secondary {
+  border-color: #ced4da;
+  color: #7f8992;
+}
+.filter-card .btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  transform: translateY(-2px);
+}
+/*.filter-select {
   position: relative;
   display: flex;
   align-items: center;
@@ -221,7 +225,7 @@
   border: 1px solid #dee2e6;
   border-radius: 12px;
   padding: 0.4rem 0.8rem;
-}
+}*/
 
 .filter-date i {
   color: #adb5bd;
@@ -244,31 +248,31 @@
   font-size: 0.8rem;
 }
 
-.filters-footer {
+/*.filters-footer {
   padding: 0.75rem 1.5rem;
   background: #fff3e8;
   border-top: 1px solid #ffe8dc;
   font-size: 0.8rem;
   color: #ff6b35;
-}
+}*/
 
 /* ============================================
    BOUTON RECHERCHE ICÔNE
-   ============================================ */
+   ============================================ 
 
 .filter-button {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-}
+}*/
 
 .btn-search {
-  background: linear-gradient(135deg, #001f3f, #ff6b35);
+  background: linear-gradient(135deg, #22507e, #ff6b35);
   border: none;
   color: white;
   width: 42px;
   height: 42px;
-  border-radius: 12px;
+  border-radius: 20px;
   transition: all 0.3s ease;
   cursor: pointer;
   display: flex;
@@ -331,7 +335,7 @@
   margin-left: 0.5rem;
 }
 
-.filter-tag {
+/* .filter-tag {
   display: inline-flex;
   align-items: center;
   background: white;
@@ -345,7 +349,7 @@
 
 .filter-tag i {
   font-size: 0.7rem;
-}
+}*/
 
 /* ============================================
    TABLEAU MODERNE
@@ -410,7 +414,7 @@
 .col-actions { width: 120px; }
 
 .id-badge {
-  background: #e8f0fe;
+  background: #d0d5da;
   color: #001f3f;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -419,12 +423,11 @@
 }
 
 .survey-code {
-  background: #e8f0fe;
+  background: #d0d5da;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
   font-size: 0.85rem;
   color: #ff6b35;
-  font-family: monospace;
 }
 
 .survey-link {
@@ -464,7 +467,7 @@
 }
 
 .status-active { background: #d4fc79; color: #1a5c1a; }
-.status-inactive { background: #e9ecef; color: #6c757d; }
+.status-inactive { background: #ea0243; color: #5f2832; }
 
 .action-buttons { 
   display: flex; 
@@ -483,12 +486,13 @@
   text-decoration: none;
   cursor: pointer;
   border: none;
+  background-color: #d0d5da;
 }
 
-.btn-view { background: #e8f0fe; color: #17a2b8; }
+.btn-view { background: #d0d5da; color: #17a2b8; }
 .btn-view:hover { background: #17a2b8; color: white; transform: scale(1.05); }
 
-.btn-edit { background: #e8f0fe; color: #001f3f; }
+.btn-edit { background: #d0d5da; color: #001f3f; }
 .btn-edit:hover { background: #001f3f; color: white; transform: scale(1.05); }
 
 .btn-delete { background: #ffe8e8; color: #dc3545; }
@@ -593,14 +597,13 @@
 @media (max-width: 768px) {
   .container { padding: 0.5rem; }
   
-  .header-glass { padding: 1rem; }
   .header-icon { width: 45px; height: 45px; font-size: 22px; }
   
   .stat-card-modern { padding: 1rem; }
   .stat-value { font-size: 1.5rem; }
   .stat-icon-wrapper { width: 45px; height: 45px; font-size: 22px; }
   
-  .filters-body { flex-direction: column; }
+  /*.filters-body { flex-direction: column; }
   .filter-group { width: 100%; }
   .filter-date { flex-wrap: wrap; }
   .date-input { width: 100%; }
@@ -637,21 +640,21 @@
   .empty-state-modern, .empty-filter { padding: 2rem; }
 
   @media (max-width: 768px) {
-  /* ... styles existants ... */
+  /* ... styles existants ... 
   
   .filter-button {
     width: 100%;
-  }
+  }*/
   
   .btn-search {
     width: 100%;
     height: 42px;
   }
   
-  .filters-footer {
+  /*.filters-footer {
     flex-direction: column;
     align-items: flex-start;
-  }
+  }*/
   
   .active-filters {
     margin-left: 0;

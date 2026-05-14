@@ -6,15 +6,6 @@
   margin: 0 auto;
 }
 
-/* Glassmorphism header */
-.header-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 31, 63, 0.1);
-}
 
 .header-icon {
   width: 60px;
@@ -76,12 +67,12 @@
 }
 
 .stat-planned {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #ad9a5e 0%, #f4bc04 100%);
   color: white;
 }
 
 .stat-ended {
-  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  background: linear-gradient(135deg, #622144 0%, #ef0a28 100%);
   color: white;
 }
 
@@ -117,7 +108,7 @@
 
 /* ============================================
    SECTION FILTRES
-   ============================================ */
+   ============================================ 
 
 .filters-card {
   background: white;
@@ -127,8 +118,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e9ecef;
 }
-
-.filters-header {
+*/
+/*.filters-header {
   padding: 1rem 1.5rem;
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
@@ -136,9 +127,9 @@
   align-items: center;
   gap: 0.5rem;
   color: #001f3f;
-}
+}*/
 
-.btn-reset {
+/*.btn-reset {
   margin-left: auto;
   background: none;
   border: none;
@@ -150,14 +141,14 @@
 
 .btn-reset:hover {
   text-decoration: underline;
-}
+}*/
 
-.filters-body {
+/*.filters-body {
   padding: 1.25rem 1.5rem;
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: center;  /* Changé de flex-end à center */
+  align-items: center;  /* Changé de flex-end à center 
 }
 
 .filter-group {
@@ -170,7 +161,7 @@
   display: flex;
   align-items: center;
 }
-
+*/
 .filter-input i {
   position: absolute;
   left: 12px;
@@ -319,7 +310,7 @@
   visibility: visible;
 }
 
-/* 🔥 FILTRES ACTIFS - TAGS */
+/* 🔥 FILTRES ACTIFS - TAGS 
 .filters-footer {
   padding: 0.6rem 1.5rem;
   background: #fff3e8;
@@ -330,7 +321,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-}
+}*/
 
 .active-filters {
   display: inline-flex;
@@ -403,8 +394,8 @@
 }
 
 .header-active { background: linear-gradient(135deg, #d4fc79, #96e6a1); }
-.header-planned { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
-.header-inactive { background: linear-gradient(135deg, #e0e0e0, #bdbdbd); }
+.header-planned { background: linear-gradient(135deg,#dfcd90 0%, #f1cb4f) ; }
+.header-inactive { background: linear-gradient(135deg,#804f5d, #bd1a4e) ; }
 .header-ended { background: linear-gradient(135deg, #cfd9df, #e2ebf0); }
 
 .session-id {
@@ -413,7 +404,7 @@
   padding: 0.25rem 0.6rem;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 20px;
-  color: #333;
+  color: #9a8181;
 }
 
 .session-status-badge {
@@ -424,8 +415,8 @@
 }
 
 .status-active { background: #28a745; color: white; }
-.status-planned { background: #17a2b8; color: white; }
-.status-inactive { background: #6c757d; color: white; }
+.status-planned { background:  #d3a510; color: white; }
+.status-inactive { background: #ca1851; color: white; }
 .status-ended { background: #343a40; color: white; }
 
 .session-actions {
@@ -462,7 +453,15 @@
   margin-bottom: 1rem;
   color: #001f3f;
 }
-
+.filter-card .btn-outline-secondary {
+  border-color: #ced4da;
+  color: #7f8992;
+}
+.filter-card .btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+  transform: translateY(-2px);
+}
 .session-info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -525,7 +524,6 @@
 
 .survey-code {
   font-size: 0.7rem;
-  font-family: monospace;
   background: #e9ecef;
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
@@ -784,9 +782,9 @@
   
   .stat-icon-wrapper { width: 45px; height: 45px; font-size: 22px; }
   
-  .filters-body { flex-direction: column; }
+  /*.filters-body { flex-direction: column; }*/
   
-  .filter-group { width: 100%; }
+  /*.filter-group { width: 100%; }
   
   .filter-button { width: 100%; }
   
@@ -809,7 +807,7 @@
   
   .empty-state, .empty-filter { padding: 2rem; }
   
-  .filters-footer { flex-direction: column; align-items: flex-start; }
+  /*.filters-footer { flex-direction: column; align-items: flex-start; }*/
   
   .active-filters { margin-left: 0; margin-top: 0.5rem; }
 }

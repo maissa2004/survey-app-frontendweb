@@ -26,6 +26,7 @@ export class SessionFormComponent implements OnInit {
   loading = false;
   error: string | null = null;
   successMessage: string | null = null;
+  alertService: any;
 
   constructor(
     private fb: FormBuilder,
@@ -137,6 +138,8 @@ export class SessionFormComponent implements OnInit {
           }, 1500);
         },
         error: (err) => {
+          // Création / mise à jour session
+          this.alertService.showError('Erreur', err.error || 'Erreur lors de la création', err.error?.message);
           console.error('❌ Erreur création:', err);
           console.error('❌ Détail:', err.error);
           this.error = err.error || 'Erreur lors de la création';

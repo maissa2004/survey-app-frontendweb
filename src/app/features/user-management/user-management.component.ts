@@ -122,13 +122,13 @@ export class UserManagementComponent implements OnInit {
       error: (err) => {
         console.error('Erreur:', err);
         if (err.error?.includes('phone')) {
-          this.alertService.showError('Erreur', 'Ce numéro de téléphone est déjà utilisé par un autre compte');
+          this.alertService.showError('Erreur', 'Ce numéro de téléphone est déjà utilisé par un autre compte','Veuillez utiliser un autre numéro de téléphone.');
         } else if (err.error?.includes('username')) {
-          this.alertService.showError('Erreur', 'Ce nom d\'utilisateur est déjà pris');
+          this.alertService.showError('Erreur', 'Ce nom d\'utilisateur est déjà pris','Veuillez choisir un autre nom d\'utilisateur.');
         } else if (err.error?.includes('email')) {
-          this.alertService.showError('Erreur', 'Cet email est déjà utilisé');
+          this.alertService.showError('Erreur', 'Cet email est déjà utilisé','Veuillez utiliser une autre adresse email.');
         } else {
-          this.alertService.showError('Erreur', err.error || 'Erreur lors de la création');
+          this.alertService.showError('Erreur', err.error || 'Erreur lors de la création','Une erreur est survenue lors de la création de l\'utilisateur. Veuillez réessayer.');
         }
         this.loading = false;
       }
@@ -143,7 +143,7 @@ export class UserManagementComponent implements OnInit {
     
     const user = this.users.find(u => u.id === id);
     if (user?.username === 'admin') {
-      this.alertService.showError('Suppression impossible', 'Impossible de supprimer le super administrateur');
+      this.alertService.showError('Suppression impossible', 'Impossible de supprimer le super administrateur', 'Le compte "admin" est protégé et ne peut pas être supprimé.');
       this.deletingId = null;
       return;
     }
@@ -177,7 +177,7 @@ export class UserManagementComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur:', err);
-        this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression');
+        this.alertService.showError('Erreur', 'Une erreur inconnue est survenue lors de la suppression','Veuillez réessayer.');
         this.deletingId = null;
       }
     });

@@ -58,6 +58,7 @@ export class SurveyListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur:', err);
+        this.alertService.showError('Erreur', 'Erreur lors du chargement des surveys', err.message);
         this.error = 'Erreur lors du chargement des surveys';
         this.loading = false;
         this.cdr.detectChanges();
@@ -169,7 +170,7 @@ async deleteSurvey(id: number): Promise<void> {
       this.loadSurveys();
     },
     error: (err) => {
-      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression');
+      this.alertService.showError('Erreur', 'Une erreur est survenue lors de la suppression',err.error?.message || err.message);
     }
   });
 }

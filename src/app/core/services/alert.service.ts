@@ -7,6 +7,7 @@ export interface Alert {
   type: 'success' | 'error' | 'warning' | 'info';
   title: string;
   message: string;
+  details?: string; 
   duration?: number;
 }
 
@@ -22,8 +23,8 @@ export class AlertService {
     setTimeout(() => this.clear(), duration);
   }
 
-  showError(title: string, message: string, duration: number = 4000): void {
-    this.alertSubject.next({ type: 'error', title, message, duration });
+  showError(title: string, message: string, details?: string, duration: number = 5000): void {
+    this.alertSubject.next({ type: 'error', title, message, details, duration });
     setTimeout(() => this.clear(), duration);
   }
 

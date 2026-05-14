@@ -60,9 +60,10 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {
-            "proxyConfig": "proxy.conf.json"
-          },
+           "options": {
+              "buildTarget": "survey-app-frontendweb:build",
+              "proxyConfig": "proxy.conf.json"
+            },
           "configurations": {
             "production": {
               "buildTarget": "appenquetesweb:build:production"

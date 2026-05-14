@@ -3,6 +3,7 @@ import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +17,7 @@ export class HeaderComponent {
 
   constructor(
     public authService: AuthService,
+    public themeService: ThemeService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -28,7 +30,7 @@ export class HeaderComponent {
       return '/user-management';
     }
     if (this.authService.isNormalAdmin()) {
-      return '/surveys';
+      return '/dashboard';
     }
     return '/login';
   }
@@ -38,5 +40,9 @@ export class HeaderComponent {
       this.authService.logout();
       this.router.navigate(['/login']);
     }
+  }
+
+  toggleDarkMode(): void {
+    this.themeService.toggleDarkMode();
   }
 }
