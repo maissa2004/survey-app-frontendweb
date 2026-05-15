@@ -1,5 +1,5 @@
 // src/app/features/session/session-form/session-form.component.ts
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -27,12 +27,16 @@ export class SessionFormComponent implements OnInit {
   error: string | null = null;
   successMessage: string | null = null;
   alertService: any;
+  loadingSurveys = true;
+  // 🔥 Pour les checkboxes
+  selectedSurveyIds: number[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {
     this.sessionForm = this.fb.group({
       intitule: ['', Validators.required],
@@ -56,24 +60,67 @@ export class SessionFormComponent implements OnInit {
   }
 
   loadSurveys(): void {
+    this.loadingSurveys = true;
+    console.log('🔃 Chargement des surveys...');
+    
     this.http.get<Survey[]>('/api/survey').subscribe({
       next: (data) => {
         this.surveys = data;
-        console.log('Surveys chargés:', data);
+        this.loadingSurveys = false;
+        console.log('✅ Surveys chargés:', this.surveys.length);
+        this.cdr.detectChanges();  // 🔥 Forcer l'affichage
       },
-      error: (err) => console.error('Erreur chargement surveys:', err)
+      error: (err) => {
+        console.error('❌ Erreur chargement surveys:', err);
+        this.loadingSurveys = false;
+        this.cdr.detectChanges();  // 🔥 Forcer l'affichage
+      }
     });
+  }
+
+  // 🔥 Vérifier si un survey est sélectionné
+  isSurveySelected(surveyId: number): boolean {
+    return this.selectedSurveyIds.includes(surveyId);
+  }
+
+  // 🔥 Obtenir le nombre de surveys sélectionnés
+  getSelectedSurveyCount(): number {
+    return this.selectedSurveyIds.length;
+  }
+
+  // 🔥 Gérer le changement d'une checkbox
+  onSurveyCheckboxChange(event: any, surveyId: number): void {
+    if (event.target.checked) {
+      if (!this.selectedSurveyIds.includes(surveyId)) {
+        this.selectedSurveyIds.push(surveyId);
+      }
+    } else {
+      const index = this.selectedSurveyIds.indexOf(surveyId);
+      if (index !== -1) {
+        this.selectedSurveyIds.splice(index, 1);
+      }
+    }
+    // Mettre à jour le FormControl
+    this.sessionForm.patchValue({
+      idSurveys: [...this.selectedSurveyIds]
+    });
+    this.sessionForm.get('idSurveys')?.updateValueAndValidity();
+    this.cdr.detectChanges();
   }
 
   loadSessionData(): void {
     this.loading = true;
     this.http.get<any>(`/api/sessions/${this.sessionId}`).subscribe({
       next: (data) => {
+        // 🔥 Récupérer les IDs des surveys déjà sélectionnés
+        const surveyIds = data.surveys?.map((s: any) => s.id) || [];
+        this.selectedSurveyIds = [...surveyIds];
+        
         this.sessionForm.patchValue({
           intitule: data.intitule,
           dateDebut: data.dateDebut?.slice(0, 16),
           dateFin: data.dateFin?.slice(0, 16),
-          idSurveys: data.surveys?.map((s: any) => s.id) || [],
+          idSurveys: surveyIds,
           status: data.status?.toLowerCase() || 'planifiee'
         });
         this.loading = false;
@@ -82,6 +129,7 @@ export class SessionFormComponent implements OnInit {
         console.error('Erreur:', err);
         this.error = 'Erreur lors du chargement';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -103,11 +151,12 @@ export class SessionFormComponent implements OnInit {
       intitule: formValue.intitule,
       dateDebut: formValue.dateDebut + ':00',
       dateFin: formValue.dateFin + ':00',
-      idSurveys: formValue.idSurveys,
+      idSurveys: this.selectedSurveyIds,  // 🔥 Utiliser la liste des checkboxes
       status: formValue.status
     };
     
     console.log('📤 Envoi session:', sessionData);
+    console.log('📤 Surveys sélectionnés:', this.selectedSurveyIds);
     console.log('📤 JSON:', JSON.stringify(sessionData));
 
     if (this.isEditMode && this.sessionId) {

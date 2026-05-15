@@ -65,6 +65,7 @@ export interface Section {
   parentAnswerId?: number;
   children?: Section[]; 
   idReferencedForm?: number; 
+  parentSectionId?: number;
 }
 
 export interface Survey {
