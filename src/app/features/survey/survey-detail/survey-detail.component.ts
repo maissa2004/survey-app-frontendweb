@@ -521,6 +521,7 @@ async deleteSection(id: number): Promise<void> {
     console.log(`📊 Réponses: ${answers.length} total, ${validAnswers.length} valides`);
     
     if (needsAnswers && validAnswers.length === 0) {
+      // showWarning only accepts title and message here; remove the third argument to match the signature
       this.alertService.showWarning('Attention', 'Ce type de question nécessite au moins une réponse valide.');
       return;
     }

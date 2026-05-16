@@ -71,8 +71,8 @@
           <i class="bi bi-check-circle-fill"></i>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Terminées</span>
-          <h2 class="stat-value">{{ getSessionsByStatus('terminee').length }}</h2>
+          <span class="stat-label">Inactives</span>
+          <h2 class="stat-value">{{ getSessionsByStatus('inactive').length }}</h2>
         </div>
       </div>
     </div>
@@ -189,7 +189,6 @@
           'header-active': session.status === 'active',
           'header-planned': session.status === 'planifiee',
           'header-inactive': session.status === 'inactive',
-          'header-ended': session.status === 'terminee'
         }">
           <div class="d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
@@ -198,13 +197,11 @@
                 'status-active': session.status === 'active',
                 'status-planned': session.status === 'planifiee',
                 'status-inactive': session.status === 'inactive',
-                'status-ended': session.status === 'terminee'
               }">
                 <i class="bi" [ngClass]="{
                   'bi-play-circle-fill': session.status === 'active',
                   'bi-calendar-check-fill': session.status === 'planifiee',
                   'bi-pause-circle-fill': session.status === 'inactive',
-                  'bi-check-circle-fill': session.status === 'terminee'
                 }"></i>
                 {{ getStatusLabel(session.status) }}
               </span>

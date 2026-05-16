@@ -183,7 +183,15 @@
   }
   .table {
     font-size: 0.85rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.5rem;
+    margin: 0;
+    background: transparent;
   }
+  .table thead {
+  display: none;
+}
   .header-title {
     gap: 0.8rem;
   }
@@ -339,13 +347,46 @@ margin-left:  11rem;
 }
 
 .table tbody tr {
-  transition: background 0.2s, transform 0.1s;
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
 }
+.table tbody tr:nth-child(1) { animation-delay: 0.03s; }
+.table tbody tr:nth-child(2) { animation-delay: 0.06s; }
+.table tbody tr:nth-child(3) { animation-delay: 0.09s; }
+.table tbody tr:nth-child(4) { animation-delay: 0.12s; }
+.table tbody tr:nth-child(5) { animation-delay: 0.15s; }
+.table tbody tr:nth-child(6) { animation-delay: 0.18s; }
+.table tbody tr:nth-child(7) { animation-delay: 0.21s; }
+.table tbody tr:nth-child(8) { animation-delay: 0.24s; }
+.table tbody tr:nth-child(9) { animation-delay: 0.27s; }
+.table tbody tr:nth-child(10) { animation-delay: 0.30s; }
 
 .table tbody tr:hover {
+   transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
   background-color: #fef9e6 !important;
-  transform: scale(1.01);
+  z-index: 2;
+  position: relative;
+}
+
+
+.table-responsive {
+  background: transparent;
+}
+
+
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .table tbody td {
@@ -469,9 +510,7 @@ margin-left:  11rem;
   }
 }
 
-.table tbody tr {
-  animation: fadeInUp 0.3s ease-out;
-}
+
 
 /* Boutons de pagination modernes */
 .btn-group .btn.rounded-pill {

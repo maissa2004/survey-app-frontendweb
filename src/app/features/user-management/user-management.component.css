@@ -392,3 +392,189 @@
   .table-modern td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 0.75rem; }
   .table-modern td:before { content: attr(data-label); font-weight: bold; margin-right: 1rem; color: #001f3f; min-width: 100px; }
 }
+/* ============================================
+   DARK MODE - USER MANAGEMENT
+   ============================================ */
+
+/* Carte statistiques */
+:host-context(.dark-mode) .stat-card-modern {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .stat-card-modern .stat-label,
+:host-context(.dark-mode) .stat-card-modern .stat-value {
+  color: #f1f5f9 !important;
+}
+
+/* Formulaire de création */
+:host-context(.dark-mode) .card-glass {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+:host-context(.dark-mode) .card-glass-header {
+  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+  border-bottom-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .card-glass-body {
+  background: #1e293b !important;
+}
+
+:host-context(.dark-mode) .form-control-modern,
+:host-context(.dark-mode) .form-select-modern {
+  background-color: #0f172a !important;
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+:host-context(.dark-mode) .form-control-modern:focus,
+:host-context(.dark-mode) .form-select-modern:focus {
+  border-color: #ffb347 !important;
+  background-color: #1e293b !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2) !important;
+}
+
+:host-context(.dark-mode) .form-label {
+  color: #cbd5e1 !important;
+}
+
+:host-context(.dark-mode) .btn-outline-navy {
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+:host-context(.dark-mode) .btn-outline-navy:hover {
+  background: #334155 !important;
+  color: white !important;
+}
+
+/* Tableau des utilisateurs */
+:host-context(.dark-mode) .table-container {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+:host-context(.dark-mode) .table-header {
+  background: #0f172a !important;
+  border-bottom-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-title {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .badge-count {
+  background: #ffb347 !important;
+  color: #63666e !important;
+}
+
+:host-context(.dark-mode) .table-modern thead th {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-bottom-color: #9da0a3 !important;
+}
+
+:host-context(.dark-mode) .table-modern tbody tr {
+  border-bottom-color: #19437e !important;
+}
+
+:host-context(.dark-mode) .table-modern tbody tr:hover {
+  background: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-modern td {
+  color: #cbd5e1 !important;
+}
+
+:host-context(.dark-mode) .id-badge {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .user-avatar {
+  background: #0f172a !important;
+  color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .user-info .fw-semibold {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .super-badge {
+  background: #f59e0b !important;
+  color: #0f172a !important;
+}
+
+:host-context(.dark-mode) .role-enqueteur {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+:host-context(.dark-mode) .access-allowed {
+  background: #1e4620 !important;
+  color: #86efac !important;
+}
+
+:host-context(.dark-mode) .access-denied {
+  background: #4a1a2a !important;
+  color: #fca5a5 !important;
+}
+
+:host-context(.dark-mode) .action-btn.btn-delete {
+  background: #4a1a2a !important;
+  color: #fca5a5 !important;
+}
+
+:host-context(.dark-mode) .action-btn.btn-delete:hover {
+  background: #dc3545 !important;
+  color: white !important;
+}
+
+:host-context(.dark-mode) .table-footer {
+  background: #0f172a !important;
+  border-top-color: #334155 !important;
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .footer-info,
+:host-context(.dark-mode) .footer-note {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .empty-state-modern {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+:host-context(.dark-mode) .empty-icon {
+  color: #334155 !important;
+}
+
+:host-context(.dark-mode) .empty-state-modern h4 {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .empty-state-modern p {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .alert-success-glass {
+  background: rgba(56, 239, 125, 0.15) !important;
+  border-left-color: #38ef7d !important;
+  color: #86efac !important;
+}
+
+:host-context(.dark-mode) .alert-danger-glass {
+  background: rgba(220, 53, 69, 0.15) !important;
+  border-left-color: #dc3545 !important;
+  color: #fca5a5 !important;
+}
+:host-context(.dark-mode) .form-control-modern::placeholder,
+:host-context(.dark-mode) .form-select-modern::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}

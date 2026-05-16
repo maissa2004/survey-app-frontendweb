@@ -482,18 +482,37 @@ deactivateSession(id: number): void {
     }
   }
 
-  removeEnqueteur(sessionSurveyId: number, userId: number, event: Event): void {
+  async removeEnqueteur(sessionSurveyId: number, userId: number, event: Event): Promise<void> {
   event.stopPropagation();
   event.preventDefault();
   
   console.log('=== REMOVE ENQUETEUR ===');
   console.log('sessionSurveyId:', sessionSurveyId);
   console.log('userId:', userId);
-  
-  if (confirm('Retirer cet enquêteur ?')) {
+  let enqueteurNom = '';
+  for (const session of this.sessions) {
+    const survey = session.surveys?.find(s => s.sessionSurveyId === sessionSurveyId);
+    const enqueteur = survey?.enqueteurs?.find(e => e.idUser === userId);
+    if (enqueteur) {
+      enqueteurNom = enqueteur.username;
+      break;
+    }
+  }
+  const confirmed = this.confirmService.show({
+    title: '⚠️ Confirmation de retrait',
+    message: `Voulez-vous vraiment retirer l'enquêteur "${enqueteurNom || userId}" de ce formulaire ?`,
+    confirmText: 'Oui, retirer',
+    cancelText: 'Non, annuler',
+    type: 'warning'
+  });
+
+
+  if (await confirmed) {
     this.sessionEnqueteurService.removeEnqueteur(sessionSurveyId, userId).subscribe({
       next: () => {
         console.log('✅ Enquêteur retiré avec succès');
+        this.alertService.showSuccess('✓ Enquêteur retiré', 'L’enquêteur a été retiré avec succès.');
+
         // Recharger les sessions pour mettre à jour l'affichage
         this.loadSessions();
       },
@@ -502,9 +521,16 @@ deactivateSession(id: number): void {
         if (err.error) {
           console.error('Détail erreur:', err.error);
         }
-        alert('Erreur lors du retrait de l\'enquêteur');
+        this.alertService.showError(
+          'Erreur',
+          'Impossible de retirer l’enquêteur.',
+          err.message || err.error?.message
+        );
       }
     });
+  } else {
+    this.alertService.showInfo('Annulé', 'Le retrait a été annulé.');
+    return;
   }
 }
 

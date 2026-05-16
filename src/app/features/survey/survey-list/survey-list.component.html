@@ -82,7 +82,7 @@
         </select>
       </div>
       <div class="col-md-3">
-        <label class="form-label fw-semibold"><i class="bi bi-calendar  me-1"></i> Date création : Du</label>
+        <label class="form-label fw-semibold"><i class="bi bi-calendar-range  me-1"></i> Date création : Du</label>
         <input type="date" class="form-control" [(ngModel)]="tempFilterDateFrom">
       </div>
       <div class="col-md-2">
@@ -149,7 +149,6 @@
       <table class="table-modern">
         <thead>
           <tr>
-            <th class="col-id"><i class="bi bi-hash me-1"></i> ID</th>
             <th class="col-code"><i class="bi bi-code-slash me-1"></i> Code</th>
             <th class="col-libelle"><i class="bi bi-file-text me-1"></i> Libellé</th>
             <th class="col-date"><i class="bi bi-calendar me-1"></i> Date création</th>
@@ -159,9 +158,6 @@
         </thead>
         <tbody>
           <tr *ngFor="let survey of filteredSurveys; let i = index" class="animate-slide-in" [style.animation-delay]="i * 0.03 + 's'">
-            <td class="col-id" data-label="ID">
-              <span class="id-badge">{{ survey.id }}</span>
-            </td>
             <td class="col-code" data-label="Code">
               <code class="survey-code">{{ survey.code }}</code>
             </td>

@@ -453,6 +453,10 @@
   margin-bottom: 1rem;
   color: #001f3f;
 }
+.filter-card {
+    border-radius: 24px !important;
+
+}
 .filter-card .btn-outline-secondary {
   border-color: #ced4da;
   color: #7f8992;
@@ -810,4 +814,75 @@
   /*.filters-footer { flex-direction: column; align-items: flex-start; }*/
   
   .active-filters { margin-left: 0; margin-top: 0.5rem; }
+
+}
+ /* ============================================
+   MODAL AFFECTATION ENQUÊTEUR - DARK MODE (Version corrigée)
+   ============================================ */
+
+:host-context(.dark-mode) .modal-glass .modal-content {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .modal-header {
+  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+  border-bottom-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .modal-header .modal-title {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .modal-body {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .modal-body p strong {
+  color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .enqueteur-item-modal {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .enqueteur-item-modal:hover {
+  background: #334155 !important;
+  border-color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .enqueteur-avatar {
+  background: #2d3a4e !important;
+  color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .enqueteur-info .fw-semibold {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .enqueteur-info .small.text-muted {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .modal-glass .modal-footer {
+  background: #0f172a !important;
+  border-top-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .btn-outline-secondary {
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+:host-context(.dark-mode) .modal-glass .btn-outline-secondary:hover {
+  background: #334155 !important;
+  color: white !important;
+}
+
+:host-context(.dark-mode) .alert-info-glass {
+  background: rgba(23, 162, 184, 0.2) !important;
+  color: #7dd3fc !important;
+  border-left-color: #38bdf8 !important;
 }

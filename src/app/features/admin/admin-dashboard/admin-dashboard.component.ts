@@ -12,6 +12,8 @@ import { environment} from '../../../../environments/environment.prod';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { Subscription } from 'rxjs';
+import { AlertService } from '../../../core/services/alert.service';
+
 
 import Highcharts from 'highcharts';
 import 'highcharts/highcharts-3d';
@@ -106,7 +108,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   };
   public sessionChartType: ChartType = 'bar';
   themeSubscription: Subscription = new Subscription;
-  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef) {}
+  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef, private alertService: AlertService) {}
   user: any = null;
   ngOnInit(): void {
     this.user = this.authService.getCurrentUser();
@@ -395,6 +397,7 @@ calculateSessionTrend(): void {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
+        legend: { position: 'bottom' },
         tooltip: { mode: 'index' }
       },
       // Ajouter une ombre portée (simule du 3D)
@@ -402,7 +405,12 @@ calculateSessionTrend(): void {
         padding: { top: 10, bottom: 10 }
       },
       scales: {
-        y: { beginAtZero: true }
+        y: { beginAtZero: true,
+          ticks: {
+            stepSize: 1,                
+            precision: 0
+          }
+         }
       }
     }
   });
@@ -434,6 +442,14 @@ private drawSessionChart() {
       indexAxis: 'y',  // graphique horizontal
       plugins: {
         legend: { position: 'bottom' }
+      },
+      scales: {
+        x: {beginAtZero: true,
+          ticks: {
+            stepSize: 1,          
+            precision: 0
+          }
+        }
       }
     }
   });
@@ -464,6 +480,22 @@ private drawSessionChart() {
   }
   
   applyDateFilter(): void {
+    // Validation des dates
+    if (!this.dateRange.start || !this.dateRange.end) {
+      this.alertService.showError('Erreur', 'Veuillez sélectionner une date de début et une date de fin.');
+      return;
+    }
+    const start = new Date(this.dateRange.start);
+    const end = new Date(this.dateRange.end);
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      this.alertService.showError('Erreur', 'Les dates sélectionnées sont invalides.');
+      return;
+    }
+    if (start > end) {
+      this.alertService.showError('Erreur', 'La date de début ne peut pas être postérieure à la date de fin.',);
+      return;
+    }
+
     if (this.dateRange.start && this.dateRange.end) {
       this.selectedRangeOption = 'custom';
       this.loadSubmissionsPerDay();

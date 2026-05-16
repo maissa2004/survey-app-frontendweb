@@ -1,4 +1,5 @@
 /* src/app/core/components/header/header.component.css */
+
 .bg-navy {
   background-color: #001f3f !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -16,6 +17,58 @@
   cursor: pointer;
 }
 
-.dropdown-item:hover {
-  background-color: #f8f9fa;
+/* ============================================
+   DROPDOWN MENU - AMÉLIORATION DE LA VISIBILITÉ
+   ============================================ */
+
+::ng-deep .dropdown-menu {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+}
+
+::ng-deep .dropdown-menu .dropdown-item {
+  color: #1e293b !important;
+  transition: all 0.2s;
+}
+
+::ng-deep .dropdown-menu .dropdown-item:hover {
+  background-color: #fff3e8 !important;
+  color: #ff6b35 !important;
+}
+
+/* Mode sombre : dropdown très clair avec texte foncé */
+::ng-deep body.dark-mode .dropdown-menu,
+::ng-deep .dark-mode .dropdown-menu {
+  background-color: #001f3f !important;  /* Fond très clair */
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+::ng-deep body.dark-mode .dropdown-menu .dropdown-item,
+::ng-deep .dark-mode .dropdown-menu .dropdown-item {
+  color: #0f172a !important;  /* Texte foncé sur fond clair */
+  font-weight: 500;
+}
+
+::ng-deep body.dark-mode .dropdown-menu .dropdown-item:hover,
+::ng-deep .dark-mode .dropdown-menu .dropdown-item:hover {
+  background-color: #ffedd5 !important;
+  color: #ea580c !important;
+}
+
+::ng-deep body.dark-mode .dropdown-menu .dropdown-divider,
+::ng-deep .dark-mode .dropdown-menu .dropdown-divider {
+  border-top-color: #cbd5e1 !important;
+}
+
+::ng-deep body.dark-mode .dropdown-menu .text-danger,
+::ng-deep .dark-mode .dropdown-menu .text-danger {
+background-color: #001f3f !important;
+  color: #eae1e1 !important;}
+
+::ng-deep body.dark-mode .dropdown-menu .text-danger:hover,
+::ng-deep .dark-mode .dropdown-menu .text-danger:hover {
+  background-color: #ff6b35 !important;
+  color: #eae1e1 !important;
 }

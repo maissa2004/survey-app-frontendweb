@@ -65,6 +65,14 @@
    CARTES STATISTIQUES
    ============================================ */
 
+   /* Cible la ligne contenant les cartes */
+.row.g-4.mb-4 {
+  justify-content: center !important;
+}
+
+/* Ajuste la largeur des colonnes pour que les cartes restent lisibles */
+
+
 .stat-card-modern {
   border-radius: 20px;
   padding: 1.25rem;
@@ -96,7 +104,7 @@
   font-size: 28px;
 }
 
-.stat-content { flex: 1; }
+.stat-content { flex: 1 ;  text-align: center; }
 .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
 .stat-value { font-size: 2rem; font-weight: bold; margin: 0; line-height: 1.2; }
 
@@ -177,6 +185,10 @@
   outline: none;
   border-color: #ff6b35;
   box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+.filter-card{
+    border-radius: 24px !important;
+
 }
 
 .filter-card .btn-outline-secondary {
@@ -662,4 +674,128 @@
   }
 }
 
+}
+
+/* ============================================
+   DARK MODE - SURVEY LIST
+   ============================================ */
+
+:host-context(.dark-mode) .table-container {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+:host-context(.dark-mode) .table-header {
+  background: #0f172a !important;
+  border-bottom-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-title {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .badge-count {
+  background: #ffb347 !important;
+  color: #0f172a !important;
+}
+
+:host-context(.dark-mode) .table-modern thead th {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+  border-bottom-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-modern tbody tr {
+  border-bottom-color: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-modern tbody tr:hover {
+  background: #334155 !important;
+}
+
+:host-context(.dark-mode) .table-modern td {
+  color: #cbd5e1 !important;
+}
+
+:host-context(.dark-mode) .survey-code {
+  background: #334155 !important;
+  color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .survey-link {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .survey-link:hover {
+  color: #ffb347 !important;
+}
+
+:host-context(.dark-mode) .survey-subtitle {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .date-info,
+:host-context(.dark-mode) .update-info {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .status-badge.status-active {
+  background: #1e4620 !important;
+  color: #86efac !important;
+}
+
+:host-context(.dark-mode) .status-badge.status-inactive {
+  background: #4a1a2a !important;
+  color: #fca5a5 !important;
+}
+
+:host-context(.dark-mode) .action-btn {
+  background: #334155 !important;
+}
+
+:host-context(.dark-mode) .btn-view {
+  background: #334155 !important;
+  color: #7dd3fc !important;
+}
+
+:host-context(.dark-mode) .btn-edit {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .btn-delete {
+  background: #4a1a2a !important;
+  color: #fca5a5 !important;
+}
+
+:host-context(.dark-mode) .table-footer {
+  background: #0f172a !important;
+  border-top-color: #334155 !important;
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .footer-info,
+:host-context(.dark-mode) .footer-update {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .empty-state-modern,
+:host-context(.dark-mode) .empty-filter {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+:host-context(.dark-mode) .empty-filter h4,
+:host-context(.dark-mode) .empty-state-modern h4 {
+  color: #f1f5f9 !important;
+}
+
+:host-context(.dark-mode) .empty-filter p,
+:host-context(.dark-mode) .empty-state-modern p {
+  color: #9ca3af !important;
+}
+
+:host-context(.dark-mode) .empty-icon,
+:host-context(.dark-mode) .empty-filter-icon {
+  color: #334155 !important;
 }
