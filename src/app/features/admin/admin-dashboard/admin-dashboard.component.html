@@ -119,7 +119,7 @@
             <i class="bi bi-file-text-fill"></i>
           </div>
           <div class="kpi-content">
-            <span class="kpi-label">Surveys</span>
+            <span class="kpi-label">Enquetes</span>
             <h2 class="kpi-value">{{ stats.totalSurveys }}</h2>
 <small class="trend up" [class.up]="trends.surveys.direction === 'up'" 
                     [class.down]="trends.surveys.direction === 'down'">
@@ -219,7 +219,7 @@
           <div class="card-header-custom">
             <div>
               <i class="bi bi-collection-fill me-2 text-primary"></i>
-              <h5 class="mb-0">Nombre de surveys par session</h5>
+              <h5 class="mb-0">Nombre d'enquetes par session</h5>
             </div>
             <button class="btn btn-sm btn-outline-secondary rounded-pill" (click)="exportChartDataCSV('sessions')">
               <i class="bi bi-filetype-csv"></i> CSV
@@ -244,7 +244,7 @@
           <div class="card-header-custom">
             <div>
               <i class="bi bi-trophy-fill me-2 text-warning"></i>
-              <h5 class="mb-0">Top 5 surveys les plus répondus</h5>
+              <h5 class="mb-0">Top 5 enquetes les plus répondues</h5>
             </div>
           </div>
           <div class="card-body-chart p-3">

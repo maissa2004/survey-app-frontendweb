@@ -14,7 +14,7 @@
   <div class="card border-0 shadow-sm">
     <div class="card-header bg-navy text-white d-flex align-items-center border-0 rounded-top">
       <i class="bi" [class.bi-pencil-square]="isEditMode" [class.bi-plus-circle]="!isEditMode" style="font-size: 1.5rem;"></i>
-      <h3 class="mb-0 ms-2">{{ isEditMode ? 'Modifier' : 'Créer' }} un Survey</h3>
+      <h3 class="mb-0 ms-2">{{ isEditMode ? 'Modifier' : 'Créer' }} une Enquete</h3>
     </div>
     <div class="card-body bg-white">
       <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()">

@@ -4,11 +4,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
-
+import { NotificationDropdownComponent } from '../notification-dropdown/notification-dropdown.component';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NotificationDropdownComponent],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })

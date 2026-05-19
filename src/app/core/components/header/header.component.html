@@ -21,14 +21,13 @@
           </a>
         </li>
         
-        
         <!-- 🔥 ADMIN NORMAL (uniquement, pas le super admin) -->
         <ng-container *ngIf="authService.isNormalAdmin()">
           <li class="nav-item">
-          <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
-            <i class="bi bi-speedometer2"></i> Tableau de bord
-          </a>
-        </li>
+            <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
+              <i class="bi bi-speedometer2"></i> Tableau de bord
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link text-white" routerLink="/surveys" routerLinkActive="active">
               <i class="bi bi-files me-1"></i> Enquêtes
@@ -46,7 +45,9 @@
           </li>
         </ng-container>
         
-        <!-- Menu dropdown utilisateur -->
+        <!-- ============================================ -->
+        <!-- MENU DROPDOWN UTILISATEUR                    -->
+        <!-- ============================================ -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
             <i class="bi bi-person-circle me-1"></i> {{ (authService.getCurrentUser()?.username) || 'User' }}
@@ -59,6 +60,15 @@
           </li>
           </ul>
         </li>
+
+        <!-- ============================================ -->
+        <!-- NOTIFICATION DROPDOWN (UNIQUEMENT POUR ADMINS) -->
+        <!-- ============================================ -->
+        <app-notification-dropdown></app-notification-dropdown>
+
+        <!-- ============================================ -->
+        <!-- BOUTON DARK MODE                             -->
+        <!-- ============================================ -->
         <li class="nav-item">
           <button class="btn btn-link text-white" (click)="toggleDarkMode()" style="background: none; border: none;">
             <i class="bi" [class.bi-moon-fill]="!(themeService.getCurrentMode())" [class.bi-sun-fill]="themeService.getCurrentMode()"></i>

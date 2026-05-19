@@ -9,7 +9,7 @@
               <i class="bi bi-file-earmark-text-fill"></i>
             </div>
             <div>
-              <h1 class="fw-bold mb-1">Liste des Surveys</h1>
+              <h1 class="fw-bold mb-1">Liste des Enquetes</h1>
               <p class="text-muted mt-2 mb-0">
                 <i class="bi bi-info-circle-fill me-1 text-orange"></i>
                 Gérez et organisez vos questionnaires d'enquête
@@ -18,7 +18,7 @@
           </div>
           <a routerLink="/surveys/new" class="btn btn-gradient mt-3 mt-md-0 animate-scale">
             <i class="bi bi-plus-circle me-2"></i>
-            Nouveau Survey
+            Nouvelle Enquete
           </a>
         </div><div class="header-progress"></div>
       </div>
@@ -34,7 +34,7 @@
           <i class="bi bi-collection"></i>
         </div>
         <div class="stat-content">
-          <span class="stat-label">Total surveys</span>
+          <span class="stat-label">Total Enquetes</span>
           <h2 class="stat-value">{{ surveys.length }}</h2>
         </div>
       </div>
@@ -117,7 +117,7 @@
     <div class="spinner-grow text-orange" role="status">
       <span class="visually-hidden">Chargement...</span>
     </div>
-    <p class="mt-3 text-muted">Chargement des surveys en cours...</p>
+    <p class="mt-3 text-muted">Chargement des enquetes en cours...</p>
   </div>
 
   <!-- Message d'erreur -->
@@ -137,10 +137,10 @@
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="table-title">
           <i class="bi bi-table me-2 text-orange"></i>
-          <strong>Tous les surveys</strong>
+          <strong>Toutes les enquetes</strong>
         </div>
         <span class="badge-count">
-          <i class="bi bi-database me-1"></i> {{ getFilteredCount() }} survey(s)
+          <i class="bi bi-database me-1"></i> {{ getFilteredCount() }} enquete(s)
         </span>
       </div>
     </div>
@@ -208,7 +208,7 @@
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="footer-info">
           <i class="bi bi-info-circle me-1 text-orange"></i>
-          {{ getFilteredCount() }} survey(s) affiché(s) sur {{ surveys.length }} total
+          {{ getFilteredCount() }} enquete(s) affichée(s) sur {{ surveys.length }} total
         </div>
         <div class="footer-update">
           <i class="bi bi-calendar-week me-1 text-orange"></i>
@@ -224,7 +224,7 @@
       <i class="bi bi-search"></i>
     </div>
     <h4>Aucun résultat trouvé</h4>
-    <p>Aucun survey ne correspond à vos critères de recherche</p>
+    <p>Aucune enquete ne correspond à vos critères de recherche</p>
     <button class="btn btn-gradient" (click)="resetFilters()">
       <i class="bi bi-arrow-counterclockwise me-2"></i>
       Réinitialiser les filtres
@@ -236,11 +236,11 @@
     <div class="empty-icon">
       <i class="bi bi-inbox"></i>
     </div>
-    <h4>Aucun survey trouvé</h4>
+    <h4>Aucune enquete trouvée</h4>
     <p>Commencez par créer votre premier questionnaire</p>
     <a routerLink="/surveys/new" class="btn btn-gradient">
       <i class="bi bi-plus-circle me-2"></i>
-      Créer le premier survey
+      Créer la première enquete
     </a>
   </div>
 </div>
