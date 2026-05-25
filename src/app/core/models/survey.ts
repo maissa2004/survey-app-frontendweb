@@ -50,6 +50,7 @@ export interface Question {
   answers?: Answer[];
   required: boolean;
   conditionnel: boolean | number;
+  si_Conditionnel?: boolean | number;  // 🔥 Valeur depuis section_question
 }
 
 export interface Section {

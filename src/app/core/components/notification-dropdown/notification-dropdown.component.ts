@@ -310,6 +310,7 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
   unreadCount: number = 0;
   isBrowser: boolean = true;
   private subscriptions: Subscription[] = [];
+  alertService: any;
 
   // Rendre authService PUBLIC pour l'utiliser dans le template
   constructor(
@@ -365,18 +366,28 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
 
   markAllAsRead(event: Event): void {
     event.stopPropagation();
-    this.notificationService.markAllAsRead().subscribe(() => {
+    this.notificationService.markAllAsRead().subscribe({
+    next: () => {
       this.notifications.forEach(n => n.read = true);
       this.updateUnreadCount();
+      this.alertService.showSuccess('Marquées comme lues', 'Toutes les notifications ont été lues.');
+    },
+    error: () => this.alertService.showError('Erreur', 'Opération impossible')
     });
   }
 
   deleteNotification(id: number, event: Event): void {
     event.stopPropagation();
-    this.notificationService.deleteNotification(id).subscribe(() => {
+    this.notificationService.deleteNotification(id).subscribe({
+    next: () => {
       this.notifications = this.notifications.filter(n => n.id !== id);
       this.updateUnreadCount();
-    });
+      this.alertService.showInfo('Notification supprimée', '', 2000);
+    },
+    error: () => {
+      this.alertService.showError('Erreur', 'Impossible de supprimer cette notification');
+    }
+  });
   }
 
   clearAll(event: Event): void {

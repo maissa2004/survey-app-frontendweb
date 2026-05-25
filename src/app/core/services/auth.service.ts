@@ -73,14 +73,14 @@ export class AuthService {
   // 🔥 NOUVEAU : Vérifier si c'est le super admin
   isSuperAdmin(): boolean {
     const user = this.getCurrentUser();
-    return user?.username === 'admin' && user?.role === 'admin';
+    return user?.username === 'superAdmin' && user?.role === 'admin';
   }
 
   // 🔥 NOUVEAU : Vérifier si c'est un admin normal
   isNormalAdmin(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === 'admin' && user?.username !== 'admin';
-    console.log('isNormalAdmin:', user?.role === 'admin' && user?.username !== 'admin');
+    return user?.role === 'admin' && user?.username !== 'superAdmin';
+    console.log('isNormalAdmin:', user?.role === 'admin' && user?.username !== 'superAdmin');
   }
 
   // 🔥 NOUVEAU : Vérifier si c'est un enquêteur

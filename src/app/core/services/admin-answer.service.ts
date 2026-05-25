@@ -39,10 +39,11 @@ export class AdminAnswerService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getSubmissions(filters: any, page: number, size: number): Observable<any> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
+  getSubmissions(filters: any, page: number, size?: number): Observable<any> {
+    let params = new HttpParams().set('page', page.toString())
+    if (size !== undefined) {
+        params = params.set('size', size.toString());
+      }
     if (filters.surveyId) params = params.set('surveyId', filters.surveyId);
     if (filters.userId) params = params.set('userId', filters.userId);
     if (filters.status) params = params.set('status', filters.status);

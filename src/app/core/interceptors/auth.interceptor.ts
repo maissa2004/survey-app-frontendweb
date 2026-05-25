@@ -6,8 +6,10 @@ import { throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+    console.log('🔍 Intercepteur appelé pour :', req.url);
   const token = localStorage.getItem('token');
-  
+    console.log('🔑 Token présent ?', !!token);
+
   let authReq = req;
   if (token) {
     authReq = req.clone({

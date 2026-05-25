@@ -9,7 +9,7 @@ import { AlertService } from '../../../core/services/alert.service';
 import { User } from '../../../core/services/session-enqueteur.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service'; 
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef,ChangeDetectionStrategy } from '@angular/core';
 
 
 @Component({
@@ -17,7 +17,8 @@ import { ChangeDetectorRef } from '@angular/core';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './submission-list.component.html',
-  styleUrls: ['./submission-list.component.css']
+  styleUrls: ['./submission-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SubmissionListComponent implements OnInit {
   
@@ -28,7 +29,7 @@ export class SubmissionListComponent implements OnInit {
   totalPages = 0;
 
   page = 0;
-  size = 20;
+  displaySize = 20;
   filters = {
     surveyId: null as number | null,
     userId: null as number | null,
@@ -68,30 +69,46 @@ export class SubmissionListComponent implements OnInit {
     this.userService.getAllUsers().subscribe(data => this.users = data.filter(u => u.role === 'enqueteur'));
   }
 
+  async loadAllSubmissionsRecursively(currentPage:number = 0, accumulator: Submission[] = []): Promise<Submission[]> {
+  const res = await this.adminService.getSubmissions(this.filters, currentPage).toPromise();
+  const newAcc = [...accumulator, ...res.content];
+  //// Si la page est pleine, il y a probablement une page suivante
+ if (res.content.length === 20) {
+    return this.loadAllSubmissionsRecursively(currentPage + 1, newAcc);
+  }
+  return newAcc;
+}
+
+
   loadSubmissions() {
     this.loading = true;
-    console.log('🔍 Chargement des soumissions avec filtres :', this.filters, 'page', this.page);
-    this.adminService.getSubmissions(this.filters, this.page, this.size).subscribe({
-      next: (res) => {
-        console.log('✅ Données reçues :', res);
-        this.submissions = res.content;
-        this.totalElements = res.totalElements;
-        this.totalPages = Math.ceil(this.totalElements / this.size);
+     this.loadAllSubmissionsRecursively(0, [])
+      .then(allSubmissions => {
+        allSubmissions.sort((a, b) =>
+          new Date(b.submissionDate).getTime() - new Date(a.submissionDate).getTime()
+        );
 
+        this.totalElements = allSubmissions.length;
+        this.totalPages = Math.ceil(this.totalElements / this.displaySize);
+
+        const start = this.page * this.displaySize;
+      this.submissions = allSubmissions.slice(start, start + this.displaySize);
         this.loading = false;
-        this.cdr.detectChanges(); // détection de changement auto
+        setTimeout(() =>this.cdr.markForCheck()); // détection de changement auto
         window.scrollTo({ top: 0, behavior: 'smooth' });
+              })
+      .catch(err => {
+                this.loading = false;
+                setTimeout(() =>this.cdr.markForCheck());
 
-      },
-      error: (err) => {
-              console.error('❌ Erreur API :', err);
-
-        this.loading = false;
+                console.error('❌ Erreur lors du chargement (Erreur API):', err);
         this.alert.showError('Erreur', err.error?.message || 'Impossible de charger les soumissions',err.error?.message || err.message);
-      }
-    });
-  }
+    
+            });   
+             console.log('🔍 Chargement des soumissions avec filtres :', this.filters, 'page', this.page);
 
+  }
+  
   onFilter() {
     this.page = 0;
     // this.selectedIds.clear();

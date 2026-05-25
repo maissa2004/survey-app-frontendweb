@@ -135,15 +135,14 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  // 🔥 SUPPRESSION CORRIGÉE - Supprimer la méthode deleteItem() qui était mal écrite
-  // Et garder uniquement deleteUser()
+  
 
   async deleteUser(id: number): Promise<void> {
     this.deletingId = id;
     
     const user = this.users.find(u => u.id === id);
-    if (user?.username === 'admin') {
-      this.alertService.showError('Suppression impossible', 'Impossible de supprimer le super administrateur', 'Le compte "admin" est protégé et ne peut pas être supprimé.');
+    if (user?.username === 'superAdmin') {
+      this.alertService.showError('Suppression impossible', 'Impossible de supprimer le super administrateur', 'Le compte "superAdmin" est protégé et ne peut pas être supprimé.');
       this.deletingId = null;
       return;
     }
@@ -166,8 +165,8 @@ export class UserManagementComponent implements OnInit {
       return;
     }
     
-    this.http.delete(`/api/auth/users/${id}`).subscribe({
-      next: () => {
+    this.http.delete(`/api/auth/users/${id}`,{ responseType: 'text', observe: 'response' }).subscribe({
+      next: (response) => {
         this.alertService.showSuccess(
           'Utilisateur supprimé', 
           `L'utilisateur "${user?.username}" a été supprimé avec succès.`
@@ -176,12 +175,47 @@ export class UserManagementComponent implements OnInit {
         this.loadUsers();
       },
       error: (err) => {
-        console.error('Erreur:', err);
-        this.alertService.showError('Erreur', 'Une erreur inconnue est survenue lors de la suppression','Veuillez réessayer.');
-        this.deletingId = null;
-      }
-    });
-  }
+    console.error('Statut HTTP reçu :', err.status);
+    console.error('Erreur complète :', err);
+    console.error('err.error :', err.error);
+    console.error('typeof err.error :', typeof err.error);
+    let errorMsg = '';
+    if (err.error && typeof err.error === 'string') {
+      errorMsg = err.error;
+    }
+    if (!errorMsg && err.message) errorMsg = err.message;
+    console.error('Message extrait :', errorMsg);
+
+  // Vérification du contenu pour afficher l'alerte appropriée
+          if (errorMsg?.includes('session_enqueteur')) {
+            this.alertService.showError(
+              'Suppression impossible',
+              'Cet utilisateur est affecté à une ou plusieurs sessions' ,'Retirez-le des sessions avant de le supprimer.'
+            );
+          } 
+           else if (errorMsg?.includes('survey_submission')) {
+            this.alertService.showError(
+              'Suppression impossible',
+              'Cet utilisateur a déjà soumis des enquêtes' ,'Supprimez d’abord ses soumissions ou changez leur état.'
+            );
+          } 
+           else if (errorMsg?.includes('foreign key') || errorMsg?.includes('contrainte')) {
+            this.alertService.showError(
+              'Suppression impossible',
+              'Cet utilisateur est lié à d’autres données.' ,'Supprimez d’abord ces dépendances.'
+            );
+          } else {
+            // Message générique affichant le code HTTP et le message réel
+            this.alertService.showError(
+              'Erreur',
+              `Impossible de supprimer l'utilisateur (${err.status}) : ${errorMsg || 'Erreur inconnue'}`,
+              'Veuillez réessayer ou contacter l\'un des administrateurs.'
+            );
+          }
+          this.deletingId = null;
+        }
+      });
+    }
 
   getAdminCount(): number {
     return this.users.filter(u => u.role === 'admin').length;

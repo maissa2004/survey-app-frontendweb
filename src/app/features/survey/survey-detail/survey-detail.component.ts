@@ -154,8 +154,10 @@ tempConditionItemId: { [key: number]: number | null } = {};
       this.ngZone.run(() => {
         this.survey = data;
         const allSections = data.sections || [];
-this.sections = this.buildSectionHierarchy(allSections);
-console.log('✅ Hiérarchie construite:', this.sections);        console.log('✅ Sections organisées:', this.sections);
+        this.sections = this.buildSectionHierarchy(allSections);
+        this.normalizeQuestions(this.sections);
+        console.log('✅ Hiérarchie construite:', this.sections);
+        console.log('✅ Sections organisées:', this.sections);
         this.loading = false;
         this.cdr.detectChanges();
       });
@@ -220,6 +222,27 @@ buildSectionHierarchy(sections: Section[]): Section[] {
   });
   
   return rootSections;
+}
+
+/**
+ * Normalize the `conditionnel` and `si_Conditionnel` fields to boolean for all questions in the hierarchy.
+ * Ensures that both fields are always boolean (true/false) instead of a number (0/1) from the database.
+ */
+private normalizeQuestions(sections: Section[]): void {
+  sections.forEach(section => {
+    if (section.questions) {
+      section.questions.forEach(question => {
+        question.conditionnel = question.conditionnel === true || question.conditionnel === 1;
+        // 🔥 Normaliser si_Conditionnel venant de section_question
+        if (question.si_Conditionnel !== undefined) {
+          question.si_Conditionnel = question.si_Conditionnel === true || question.si_Conditionnel === 1;
+        }
+      });
+    }
+    if (section.children) {
+      this.normalizeQuestions(section.children);
+    }
+  });
 }
 
   openSectionForm(): void {
@@ -317,13 +340,13 @@ idSurvey: this.survey.id
 }
 
   editSection(section: Section): void {
-  console.log('=== EDIT SECTION ===');
-  console.log('Section reçue:', section);
-  console.log('section.conditionnel valeur:', section.conditionnel);
-  console.log('section.conditionnel type:', typeof section.conditionnel);
+    console.log('=== EDIT SECTION ===');
+    console.log('Section reçue:', section);
+    console.log('section.conditionnel valeur:', section.conditionnel);
+    console.log('section.conditionnel type:', typeof section.conditionnel);
 
     this.editingSection = section;
-    const isConditionnel = section.conditionnel === 1 || section.conditionnel === true;
+    const isConditionnel = section.conditionnel === true || section.conditionnel === 1;
     console.log('isConditionnel calculé:', isConditionnel);
 
     this.sectionForm.patchValue({
@@ -443,13 +466,16 @@ async deleteSection(id: number): Promise<void> {
   this.selectedSection = section;
   this.editingQuestion = question;
   
+  // 🔥 Récupérer si_Conditionnel depuis section_question (pas conditionnel)
+  const isConditionnel = question.si_Conditionnel === true || question.si_Conditionnel === 1;
+  
   // Réinitialiser le formulaire
   this.questionForm.reset({
     code: question.code,
     titleFr: question.titleFr,
     titleEn: question.titleEn || '',
     required: question.required,
-    conditionnel: question.conditionnel,
+    conditionnel: isConditionnel,
     id_nm_type_quest: question.id_nm_type_quest,
     answers: []
   });
@@ -552,7 +578,7 @@ async deleteSection(id: number): Promise<void> {
             // 🔥 PRÉPARER LES RÉPONSES VALIDES AVEC LEURS CONDITIONS
             const answersForBackend = validAnswers.map((a: any) => {
               // Extraire les IDs des questions conditionnelles
-              const condiQuestionIds = (a.condiQuestion || []).map((q: any) => q.id).filter((id: number) => id);
+              const condiQuestionIds = ((a.condiQuestions || a.condiQuestion) || []).map((q: any) => q.id).filter((id: number) => id);
               // Extraire les IDs des sections conditionnelles
               const condiSectionIds = (a.condiSections || []).map((s: any) => s.id).filter((id: number) => id);
               
@@ -1135,6 +1161,7 @@ addConditionToAnswer(answerIndex: number): void {
               console.log('✅ Question conditionnelle ajoutée au formulaire:', newQuestion.titleFr);
               this.alertService.showSuccess('Succès', 'Question conditionnelle ajoutée');
               this.cdr.detectChanges();
+              this.reloadSurvey();
             },
             error: (err) => {
               console.error('❌ Erreur récupération question:', err);
@@ -1152,6 +1179,7 @@ addConditionToAnswer(answerIndex: number): void {
               console.log('✅ Section conditionnelle ajoutée au formulaire:', newSection.title);
               this.alertService.showSuccess('Succès', 'Section conditionnelle ajoutée');
               this.cdr.detectChanges();
+              this.reloadSurvey();
             },
             error: (err) => {
               console.error('❌ Erreur récupération section:', err);
@@ -1187,9 +1215,27 @@ removeConditionFromAnswer(answerIndex: number, type: 'question' | 'section', ite
   this.http.delete(url).subscribe({
     next: () => {
       console.log('✅ Condition supprimée');
+      if (answerControl) {
+        if (type === 'question') {
+          const currentQuestions = answerControl.value.condiQuestion || [];
+          answerControl.patchValue({
+            condiQuestion: currentQuestions.filter((q: any) => q.id !== itemId)
+          });
+        } else {
+          const currentSections = answerControl.value.condiSections || [];
+          answerControl.patchValue({
+            condiSections: currentSections.filter((s: any) => s.id !== itemId)
+          });
+        }
+      }
+      this.alertService.showSuccess('Succès', 'Condition supprimée');
+      this.cdr.detectChanges();
       this.reloadSurvey();
-    },
-    error: (err) => console.error('❌ Erreur:', err)
+    }, 
+    error: (err) => {
+      console.error('❌ Erreur:', err);
+      this.alertService.showError('Erreur', 'Impossible de supprimer la condition', err.error?.details);
+    }
   });
 }
 

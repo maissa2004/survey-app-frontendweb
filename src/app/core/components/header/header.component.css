@@ -20,7 +20,12 @@
 /* ============================================
    DROPDOWN MENU - AMÉLIORATION DE LA VISIBILITÉ
    ============================================ */
-
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.navbar-toggler {
+  border-color: white;
+}
 ::ng-deep .dropdown-menu {
   background-color: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
@@ -40,7 +45,7 @@
 /* Mode sombre : dropdown très clair avec texte foncé */
 ::ng-deep body.dark-mode .dropdown-menu,
 ::ng-deep .dark-mode .dropdown-menu {
-  background-color: #001f3f !important;  /* Fond très clair */
+  background-color: #f8fafc !important;  /* Fond très clair */
   border: 1px solid #cbd5e1 !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
@@ -69,6 +74,6 @@ background-color: #001f3f !important;
 
 ::ng-deep body.dark-mode .dropdown-menu .text-danger:hover,
 ::ng-deep .dark-mode .dropdown-menu .text-danger:hover {
-  background-color: #ff6b35 !important;
+  background-color: #41346f !important;
   color: #eae1e1 !important;
 }

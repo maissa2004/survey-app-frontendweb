@@ -108,7 +108,7 @@
         Créer un utilisateur
       </h5>
       <small class="text-white-50">Remplissez les informations ci-dessous</small>
-    </div>
+    </div> 
     <div class="card-glass-body">
       <div class="row g-3">
         <div class="col-md-3">
@@ -118,7 +118,7 @@
           </label>
           <input type="text" class="form-control form-control-modern" 
                  [(ngModel)]="newUser.username" 
-                 placeholder="ex: jean.dupont">
+                 placeholder="ex: Nom Prénom ">
         </div>
         <div class="col-md-3">
           <label class="form-label fw-semibold">
@@ -127,7 +127,7 @@
           </label>
           <input type="email" class="form-control form-control-modern" 
                  [(ngModel)]="newUser.email" 
-                 placeholder="ex: jean@example.com" >
+                 placeholder="ex: nom@gmail.com" >
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">
@@ -136,7 +136,7 @@
           </label>
           <input type="text" class="form-control form-control-modern" 
                  [(ngModel)]="newUser.phone" 
-                 placeholder="ex: 0612345678">
+                 placeholder="ex: 2012345678">
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">
@@ -145,7 +145,7 @@
           </label>
           <input type="password" class="form-control form-control-modern" 
                  [(ngModel)]="newUser.password" 
-                 placeholder="******">
+                 placeholder="*****">
         </div>
         <div class="col-md-2">
           <label class="form-label fw-semibold">
@@ -216,7 +216,7 @@
                 </div>
                 <div>
                   <div class="fw-semibold">{{ user.username }}</div>
-                  <span *ngIf="user.username === 'admin'" class="super-badge">SUPER ADMIN</span>
+                  <span *ngIf="user.username === 'superAdmin'" class="super-badge">SUPER ADMIN</span>
                 </div>
               </div>
             </td>
@@ -241,7 +241,7 @@
             <td data-label="Actions" class="text-center">
               <button class="action-btn btn-delete" 
                       (click)="deleteUser(user.id)" 
-                      *ngIf="user.username !== 'admin'"
+                      *ngIf="user.username !== 'superAdmin'"
                       title="Supprimer">
                 <i class="bi bi-trash"></i>
               </button>

@@ -1,13 +1,16 @@
 // src/app/core/components/alert/alert.component.ts
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertService, Alert } from '../../services/alert.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-alert',
   standalone: true,
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div *ngIf="alert" class="alert-container animate-slide-in" [ngClass]="'alert-' + alert.type">
       <div class="alert-content">
@@ -73,6 +76,7 @@ import { AlertService, Alert } from '../../services/alert.service';
       font-weight: 700;
       font-size: 0.95rem;
       margin-bottom: 0.2rem;
+      
     }
 
     .alert-message {
@@ -162,6 +166,51 @@ import { AlertService, Alert } from '../../services/alert.service';
     .alert-info .alert-progress {
       background: #17a2b8;
     }
+     :host-context(.dark-mode) .alert-confirm-modal .modal-content {
+  background-color: #1e293b;
+  border-left-color: #f97316;
+}
+:host-context(.dark-mode) .alert-title {
+  color: #f97316;
+}
+:host-context(.dark-mode) .alert-message {
+  color: #cbd5e1;
+}
+:host-context(.dark-mode) .alert-icon.warning {
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+}
+
+:host-context(.dark-mode) .alert-icon.warning {
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+}
+  .alert-confirm-modal {
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+.alert-confirm-modal .modal-content {
+  border: none;
+  border-left: 4px solid #dc3545;
+}
+.alert-confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.alert-icon.warning {
+  width: 40px;
+  height: 40px;
+  background: rgba(220, 53, 69, 0.15);
+  border-radius: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc3545;
+  font-size: 1.3rem;
+}
 
     @keyframes slideInRight {
       from {
@@ -192,17 +241,26 @@ import { AlertService, Alert } from '../../services/alert.service';
     }
   `]
 })
-export class AlertComponent implements OnInit {
+export class AlertComponent implements OnInit, OnDestroy {
   alert: Alert | null = null;
   showDetails = false;
+  private sub: Subscription | null = null;
  
-  constructor(private alertService: AlertService) {}
+  constructor(private alertService: AlertService, private cd: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.alertService.alerts$.subscribe(alert => {
-      this.alert = alert;
-      this.showDetails = false;
+    this.sub = this.alertService.alerts$.subscribe(alert => {
+      // schedule in macrotask so assignment happens outside current CD cycle
+      setTimeout(() => {
+        this.alert = alert;
+        this.showDetails = false;
+        this.cd.markForCheck();
+      }, 0);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   getIcon(): string {

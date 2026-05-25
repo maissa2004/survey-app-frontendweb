@@ -19,23 +19,24 @@ export class AlertService {
   alerts$ = this.alertSubject.asObservable();
 
   showSuccess(title: string, message: string, duration: number = 3000): void {
-    this.alertSubject.next({ type: 'success', title, message, duration });
-    setTimeout(() => this.clear(), duration);
+    // emit on next macrotask to avoid changing bindings during current CD cycle
+    setTimeout(() => this.alertSubject.next({ type: 'success', title, message, duration }), 0);
+    setTimeout(() => this.clear(), duration + 0);
   }
 
   showError(title: string, message: string, details?: string, duration: number = 5000): void {
-    this.alertSubject.next({ type: 'error', title, message, details, duration });
-    setTimeout(() => this.clear(), duration);
+    setTimeout(() => this.alertSubject.next({ type: 'error', title, message, details, duration }), 0);
+    setTimeout(() => this.clear(), duration + 0);
   }
 
   showWarning(title: string, message: string, duration: number = 3000): void {
-    this.alertSubject.next({ type: 'warning', title, message, duration });
-    setTimeout(() => this.clear(), duration);
+    setTimeout(() => this.alertSubject.next({ type: 'warning', title, message, duration }), 0);
+    setTimeout(() => this.clear(), duration + 0);
   }
 
   showInfo(title: string, message: string, duration: number = 3000): void {
-    this.alertSubject.next({ type: 'info', title, message, duration });
-    setTimeout(() => this.clear(), duration);
+    setTimeout(() => this.alertSubject.next({ type: 'info', title, message, duration }), 0);
+    setTimeout(() => this.clear(), duration + 0);
   }
 
   clear(): void {

@@ -51,6 +51,7 @@ export class SurveyListComponent implements OnInit {
       next: (data) => {
         console.log('Surveys chargés:', data);
         this.surveys = data;
+        this.surveys.sort((a, b) => new Date(b.dtAdd).getTime() - new Date(a.dtAdd).getTime());
         this.applyFilters();
         this.loading = false;
         this.lastUpdate = new Date();
@@ -108,7 +109,7 @@ export class SurveyListComponent implements OnInit {
       
       return matchesSearch && matchesStatus && matchesDate;
     });
-    
+    this.filteredSurveys.sort((a, b) => new Date(b.dtAdd).getTime() - new Date(a.dtAdd).getTime());
     console.log('📊 Résultats:', this.filteredSurveys.length, 'sur', this.surveys.length);
     this.cdr.detectChanges();
   }

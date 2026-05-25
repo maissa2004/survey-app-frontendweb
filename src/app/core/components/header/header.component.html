@@ -7,7 +7,7 @@
       SurveyManager
     </a>
     
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" >
       <span class="navbar-toggler-icon"></span>
     </button>
     
@@ -15,7 +15,7 @@
       <ul class="navbar-nav ms-auto">
         
         <!-- 🔥 SUPER ADMIN - Gestion des users UNIQUEMENT -->
-        <li class="nav-item" *ngIf="authService.isSuperAdmin()">
+        <li class="nav-item"  *ngIf="authService.isSuperAdmin()">
           <a class="nav-link text-white" routerLink="/user-management" routerLinkActive="active">
             <i class="bi bi-people-fill me-1"></i> Gestion Utilisateurs
           </a>
@@ -23,7 +23,7 @@
         
         <!-- 🔥 ADMIN NORMAL (uniquement, pas le super admin) -->
         <ng-container *ngIf="authService.isNormalAdmin()">
-          <li class="nav-item">
+          <li class="nav-item" >
             <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
               <i class="bi bi-speedometer2"></i> Tableau de bord
             </a>
