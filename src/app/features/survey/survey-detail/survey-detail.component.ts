@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
@@ -28,6 +28,7 @@ export class SurveyDetailComponent implements OnInit {
   subSectionForm: FormGroup;
   questionForm: FormGroup;
   
+  @ViewChild('sectionFormContainer') sectionFormContainer!: ElementRef;
   showSectionForm = false;
   showSubSectionForm = false;
   showQuestionForm = false;
@@ -35,6 +36,7 @@ export class SurveyDetailComponent implements OnInit {
   selectedParentSection: Section | null = null;
   editingSection: Section | null = null;
   editingQuestion: Question | null = null;
+  editingSectionQuestionId: number | null = null;//pour obligatoire de question
   tempConditionType: { [key: number]: 'question' | 'section' } = {};
 tempConditionItemId: { [key: number]: number | null } = {};
 
@@ -233,6 +235,7 @@ private normalizeQuestions(sections: Section[]): void {
     if (section.questions) {
       section.questions.forEach(question => {
         question.conditionnel = question.conditionnel === true || question.conditionnel === 1;
+        question.required = question.required === true ;
         // 🔥 Normaliser si_Conditionnel venant de section_question
         if (question.si_Conditionnel !== undefined) {
           question.si_Conditionnel = question.si_Conditionnel === true || question.si_Conditionnel === 1;
@@ -358,6 +361,12 @@ idSurvey: this.survey.id
     });
     this.showSectionForm = true;
     this.cdr.detectChanges();
+    setTimeout(() => {
+      this.sectionFormContainer?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 100);
   }
 
   updateSection(): void {
@@ -465,16 +474,17 @@ async deleteSection(id: number): Promise<void> {
   
   this.selectedSection = section;
   this.editingQuestion = question;
-  
+
+this.editingSectionQuestionId = question.idSectionQues ?? null;  
   // 🔥 Récupérer si_Conditionnel depuis section_question (pas conditionnel)
-  const isConditionnel = question.si_Conditionnel === true || question.si_Conditionnel === 1;
-  
+  const isConditionnel = question.conditionnel === true || question.conditionnel === 1;
+  const isRequired = question.required === true ;
   // Réinitialiser le formulaire
   this.questionForm.reset({
     code: question.code,
     titleFr: question.titleFr,
     titleEn: question.titleEn || '',
-    required: question.required,
+    required: isRequired,
     conditionnel: isConditionnel,
     id_nm_type_quest: question.id_nm_type_quest,
     answers: []
@@ -561,7 +571,8 @@ async deleteSection(id: number): Promise<void> {
       code: this.questionForm.value.code,
       titleFr: this.questionForm.value.titleFr,
       titleEn: this.questionForm.value.titleEn || '',
-      id_nm_type_quest: idNmTypeQuest
+      id_nm_type_quest: idNmTypeQuest,
+      surveyId: this.survey!.id
     };
     
     if (this.editingQuestion) {
@@ -573,6 +584,17 @@ async deleteSection(id: number): Promise<void> {
         next: () => {
           console.log('✅ Question mise à jour');
           
+          // Fonction pour mettre à jour SectionQuestion.isRequired(obligatoire)
+      const updateSectionQuestion =async () => {
+        if (this.editingSectionQuestionId) {
+          const sqPayload = {
+            required: this.questionForm.value.required === true,
+            conditionnel: this.questionForm.value.conditionnel === true
+          };
+          return this.http.patch(`/api/sectionQuestion/${this.editingSectionQuestionId}/required`, sqPayload).toPromise();
+        }
+        return Promise.resolve();
+      };
           // 🔥 2. Si besoin, remplacer les réponses AVEC LEURS CONDITIONS
           if (needsAnswers) {
             // 🔥 PRÉPARER LES RÉPONSES VALIDES AVEC LEURS CONDITIONS
@@ -597,7 +619,8 @@ async deleteSection(id: number): Promise<void> {
             
             // 🔥 3. Appeler replace-answers
             this.http.put(`/api/questionAnswers/question/${questionId}/replace-answers`, answersForBackend).subscribe({
-              next: () => {
+              next: async () => {
+                await updateSectionQuestion();
                 console.log('✅ Réponses remplacées avec succès');
                 this.loadSurvey(this.survey!.id!);
                 this.cancelQuestionForm();
@@ -613,6 +636,7 @@ async deleteSection(id: number): Promise<void> {
             // 🔥 Pas de réponses attendues, supprimer les anciennes si elles existent
             this.http.delete(`/api/questionAnswers/question/${questionId}/full`).subscribe({
               next: () => {
+                updateSectionQuestion();
                 console.log('✅ Anciennes réponses supprimées');
                 this.loadSurvey(this.survey!.id!);
                 this.cancelQuestionForm();
