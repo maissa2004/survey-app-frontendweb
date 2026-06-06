@@ -213,37 +213,43 @@
               </div>
             </div>
             <div class="mt-2 ps-3">
-              <div *ngIf="ans.codeQuestion.toUpperCase() === 'DATE_RANGE'">
+              <div *ngIf="ans.codeQuestion.toUpperCase().includes('DATE') && ans.codeQuestion.toUpperCase().includes('RANGE')">
                 <span class="badge bg-secondary me-1">Période</span>
                 {{ formatDateRange(ans) }}
               </div>
-              <div *ngIf="ans.value && !ans.selectedOptions?.length && !ans.fileName && !ans.codeQuestion.toUpperCase().includes('SIGN') && ans.codeQuestion.toUpperCase() !== 'DATE_RANGE'">
-                <span class="badge bg-secondary me-1">Réponse</span> {{ ans.value }}
-              </div>
-              <div *ngIf="ans.selectedOptions?.length">
-                <span class="badge bg-secondary me-1">Options</span> {{ ans.selectedOptions?.join(', ') }}
-              </div>
               <!-- BARCODE -->
-              <div *ngIf="ans.codeQuestion.toUpperCase() === 'BARCODE' && ans.referenceCode">
+              <div *ngIf="ans.codeQuestion.toUpperCase().includes('BARCODE') && ans.referenceCode">
                 <span class="badge bg-secondary me-1">Code‑barre</span> {{ ans.referenceCode }}
                 <div *ngIf="ans.fileName && ans.fileType?.startsWith('image/')">
                   <img [src]="getFileUrl(ans.id)" class="img-fluid mt-2 border rounded" style="max-height:100px">
                 </div>
               </div>
+              <div *ngIf="ans.codeQuestion.toUpperCase().includes('DATE') && ans.value && !ans.codeQuestion.toUpperCase().includes('RANGE') && !ans.value.includes('|')">
+                <span class="badge bg-secondary me-1">Date</span>
+                  {{ ans.value ? (ans.value | date:'yyyy-MM-dd') : '' }}
+              </div>
               <!-- Image / Fichier -->
               <div *ngIf="ans.fileName && ans.fileType?.startsWith('image/')">
                 <span class="badge bg-secondary me-1">Image</span> {{ ans.fileName }}
-                <img [src]="getFileUrl(ans.id)" class="img-fluid mt-2 border rounded" style="max-height:120px">
-              </div>
+                  <img [src]="'data:' + getMimeType(ans.fileType) + ';base64,' + ans.value" 
+                        class="img-fluid mt-2 border rounded" style="max-height:120px"
+                        (error)="onImageError($event)">
+                    </div>
               <div *ngIf="ans.fileName && !ans.fileType?.startsWith('image/')">
                 <span class="badge bg-secondary me-1">Fichier</span>
-                <a (click)="downloadFileFromBase64(ans.value, ans.fileName, ans.fileType)" class="text-primary" style="cursor:pointer">
+                <a (click)="downloadFile(ans.id, ans.fileName)" class="text-primary" style="cursor:pointer">
                   <i class="bi bi-download"></i> {{ ans.fileName }}
                 </a>
               </div>
               <div *ngIf="ans.codeQuestion.toUpperCase().includes('SIGN') && ans.value">
                 <span class="badge bg-secondary me-1">Signature</span>
                 <img [src]="'data:image/png;base64,' + ans.value" class="img-fluid border rounded mt-2" style="max-height:80px">
+              </div>
+              <div *ngIf="ans.value && !ans.selectedOptions?.length && !ans.fileName && !ans.codeQuestion.toUpperCase().includes('SIGN') && !(ans.codeQuestion.toUpperCase().includes('DATE') && ans.codeQuestion.toUpperCase().includes('RANGE')) && !ans.codeQuestion.toUpperCase().includes('BARCODE') && !ans.codeQuestion.toUpperCase().includes('DATE')">
+                <span class="badge bg-secondary me-1">Réponse</span> {{ ans.value }}
+              </div>
+              <div *ngIf="ans.selectedOptions?.length">
+                <span class="badge bg-secondary me-1">Options</span> {{ ans.selectedOptions?.join(', ') }}
               </div>
             </div>
           </div>

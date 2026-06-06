@@ -6,6 +6,7 @@ import { RouterModule, Router } from '@angular/router';
 import { NotificationService, Notification } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
+import { ConfirmService, ConfirmOptions  } from '../../services/confirm.service';
 
 @Component({
   selector: 'app-notification-dropdown',
@@ -65,9 +66,11 @@ import { Subscription } from 'rxjs';
                 <span class="badge bg-secondary">{{ notif.enqueteurNom }}</span>
               </div>
             </div>
-            <button class="notification-delete" (click)="deleteNotification(notif.id, $event)" title="Supprimer">
-              <i class="bi bi-x-lg"></i>
-            </button>
+              <div class="notification-actions">
+                <button class="notification-delete" (click)="deleteNotification(notif.id, $event)" title="Supprimer">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
           </div>
         </div>
         
@@ -185,6 +188,7 @@ import { Subscription } from 'rxjs';
 
     .notification-content {
       flex: 1;
+      min-width: 0;
     }
 
     .notification-title {
@@ -199,6 +203,7 @@ import { Subscription } from 'rxjs';
       color: #6c757d;
       margin-bottom: 0.5rem;
       line-height: 1.4;
+      word-break: break-word;
     }
 
     .notification-time {
@@ -222,6 +227,12 @@ import { Subscription } from 'rxjs';
       background-color: #fff3e8;
       color: #ff6b35;
     }
+      .notification-actions {
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+        display: flex;
+        align-items: center;
+      }
 
     .notification-delete {
       background: none;
@@ -318,6 +329,7 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private confirmService: ConfirmService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -392,14 +404,30 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
 
   clearAll(event: Event): void {
     event.stopPropagation();
-    if (confirm('Êtes-vous sûr de vouloir supprimer toutes les notifications ?')) {
-      this.notificationService.deleteAllNotifications().subscribe(() => {
-        this.notifications = [];
-        this.updateUnreadCount();
+      const options: ConfirmOptions = {
+        title: 'Supprimer toutes les notifications',
+        message: 'Êtes-vous sûr de vouloir supprimer toutes les notifications ?',
+        type: 'danger',
+        confirmText: 'Tout supprimer',
+        cancelText: 'Annuler'
+      };
+  
+  this.confirmService.show(options).then(confirmed => {
+    if (confirmed) {
+      this.notificationService.deleteAllNotifications().subscribe({
+        next: () => {
+          this.notifications = [];
+          this.updateUnreadCount();
+          this.alertService.showSuccess('Supprimées', 'Toutes les notifications ont été supprimées.');
+          
+        },
+        error: () =>this.alertService.showError('Erreur', 'Impossible de supprimer')
+        
       });
     }
-  }
-
+  });
+}
+    
   private updateUnreadCount(): void {
     this.unreadCount = this.notifications.filter(n => !n.read).length;
   }

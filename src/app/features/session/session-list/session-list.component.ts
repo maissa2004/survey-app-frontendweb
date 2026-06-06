@@ -374,7 +374,7 @@ extractEnqueteurs(): void {
   this.http.post(`/api/sessions/${id}/activate`, {}).subscribe({
     next: () => {
       this.alertService.showSuccess(
-        'Session activée', 
+        '✓ Session activée', 
         `La session "${session?.intitule}" a été activée avec succès.`
       );
       this.loadSessions();
@@ -391,7 +391,7 @@ deactivateSession(id: number): void {
   this.http.post(`/api/sessions/${id}/deactivate`, {}).subscribe({
     next: () => {
       this.alertService.showSuccess(
-        'Session désactivée', 
+        '⏸ Session désactivée', 
         `La session "${session?.intitule}" a été désactivée avec succès.`
       );
       this.loadSessions();
@@ -437,7 +437,7 @@ deactivateSession(id: number): void {
   this.http.delete(`/api/sessions/${id}`).subscribe({
     next: () => {
       this.alertService.showSuccess(
-        '✓ Session supprimée', 
+        '🗑️ Session supprimée', 
         `La session "${session.intitule}" a été supprimée avec succès.`
       );
       this.loadSessions();
@@ -472,12 +472,24 @@ deactivateSession(id: number): void {
 
   assignEnqueteur(userId: number): void {
     if (this.selectedSessionSurveyId) {
+      const enqueteur = this.availableEnqueteurs.find(e => e.id === userId);
+      const enqueteurNom = enqueteur?.username || `ID ${userId}`;
       this.sessionEnqueteurService.assignEnqueteur(this.selectedSessionSurveyId, userId).subscribe({
         next: () => {
+          this.alertService.showSuccess(
+            'Affectation réussie',
+            `L'enquêteur "${enqueteurNom}" a été affecté au formulaire "${this.selectedSurveyName}".`
+          );
           this.loadSessions();
           this.closeEnqueteurModal();
         },
-        error: (err) => console.error('Erreur affectation:', err)
+        error: (err) =>  {
+          console.error('Erreur affectation:', err);
+          this.alertService.showError(
+            'Erreur d’affectation',
+            err.error?.message || 'Impossible d’affecter l’enquêteur. Veuillez réessayer.'
+          );
+        }
       });
     }
   }
@@ -511,7 +523,7 @@ deactivateSession(id: number): void {
     this.sessionEnqueteurService.removeEnqueteur(sessionSurveyId, userId).subscribe({
       next: () => {
         console.log('✅ Enquêteur retiré avec succès');
-        this.alertService.showSuccess('✓ Enquêteur retiré', 'L’enquêteur a été retiré avec succès.');
+        this.alertService.showSuccess('🗑️ Enquêteur retiré', 'L’enquêteur a été retiré avec succès.');
 
         // Recharger les sessions pour mettre à jour l'affichage
         this.loadSessions();

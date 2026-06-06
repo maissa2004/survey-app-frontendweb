@@ -437,6 +437,17 @@ formatDateRange(answer: any): string {
   
   return value;
 }
+getMimeType(ext: string | undefined): string {
+  if (!ext) return 'application/octet-stream';
+  const map: {[key: string]: string} = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'pdf': 'application/pdf'
+  };
+  return map[ext.toLowerCase()] || 'application/octet-stream';
+}
 
 // Méthode utilitaire pour extraire la date (avant le 'T')
 private extractDate(dateStr: string): string {
@@ -445,4 +456,6 @@ private extractDate(dateStr: string): string {
   const parts = dateStr.split('T');
   return parts[0];
 }
+
+
 }

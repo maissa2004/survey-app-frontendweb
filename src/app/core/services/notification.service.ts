@@ -62,16 +62,16 @@ export class NotificationService {
   }
 
   getAllNotifications(): Observable<Notification[]> {
-    return this.http.get<Notification[]>(this.apiUrl);
-  }
+  return this.http.get<Notification[]>(`${this.apiUrl}?type=SUBMISSION`);
+}
 
   getUnreadNotifications(): Observable<Notification[]> {
     return this.http.get<Notification[]>(`${this.apiUrl}/unread`);
   }
 
   getUnreadCount(): Observable<{ count: number }> {
-    return this.http.get<{ count: number }>(`${this.apiUrl}/unread/count`);
-  }
+  return this.http.get<{ count: number }>(`${this.apiUrl}/unread/count?type=SUBMISSION`);
+}
 
   markAsRead(id: number): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}/read`, {});
