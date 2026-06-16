@@ -1115,20 +1115,32 @@ getQuestionTypeCode(typeId: number): string {
 }
 
 // Récupérer les questions disponibles pour les conditions (exclure la question courante)
-getAvailableQuestionsForCondition(currentAnswer: any): any[] {
+getAvailableQuestionsForCondition(): any[] {
   const allQuestions: any[] = [];
   
-  this.sections.forEach(section => {
-    if (section.questions) allQuestions.push(...section.questions);
+ this.sections.forEach(section => {
+    if (section.questions) {
+      section.questions.forEach(q => {
+        if (q.conditionnel === true && q.id !== this.editingQuestion?.id) {
+          allQuestions.push(q);
+        }
+      });
+    }
     if (section.children) {
       section.children.forEach(child => {
-        if (child.questions) allQuestions.push(...child.questions);
+        if (child.questions)  {
+          child.questions.forEach(q => {
+            if (q.conditionnel === true && q.id !== this.editingQuestion?.id) {
+              allQuestions.push(q);
+            }
+          });
+        }
       });
     }
   });
   
   // Exclure la question en cours d'édition
-  return allQuestions.filter(q => q.id !== this.editingQuestion?.id);
+  return allQuestions;
 }
 
 // Récupérer toutes les sections disponibles
@@ -1136,8 +1148,16 @@ getAvailableSectionsForCondition(): any[] {
   const allSections: any[] = [];
   
   this.sections.forEach(section => {
-    allSections.push(section);
-    if (section.children) allSections.push(...section.children);
+    if (section.conditionnel === true) {
+      allSections.push(section);
+    }
+    if (section.children) {
+      section.children.forEach(child => {
+        if (child.conditionnel === true) {
+          allSections.push(child);
+        }
+      });
+    }
   });
   
   return allSections;

@@ -108,7 +108,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   };
   public sessionChartType: ChartType = 'bar';
   themeSubscription: Subscription = new Subscription;
-  constructor(private dashboardService: DashboardService, private cdr: ChangeDetectorRef, private alertService: AlertService) {}
+  constructor(
+    private dashboardService: DashboardService, 
+    private cdr: ChangeDetectorRef, 
+    private alertService: AlertService) {}
   user: any = null;
   ngOnInit(): void {
     this.user = this.authService.getCurrentUser();
@@ -165,6 +168,8 @@ calculateSurveyTrend(): void {
 calculateSessionTrend(): void {
     const current = this.stats.totalSessions;
     const previous = this.priorStats.totalSessions;
+      console.log('📈 Session - current:', current, 'previous:', previous);
+
     const trend = this.calculateTrend(current, previous);
     this.trends.sessions = {
         value: trend.value,
@@ -173,41 +178,31 @@ calculateSessionTrend(): void {
     };
 }
   calculateSubmissionTrend(): void {
-    const currentSum = this.dailySubmissions.reduce((sum, d) => sum + d.count, 0);
-    if (currentSum === 0) {
-      this.trends.submissions = { value: 0, direction: 'steady', label: '0%' };
-      return;
-    }
-
-    // Période précédente (même nombre de jours)
-    const startDate = new Date(this.dateRange.start || this.formatDate(this.addDays(new Date(), -7)));
-    const endDate = new Date(this.dateRange.end || this.formatDate(new Date()));
-    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
-    const prevStartDate = this.addDays(startDate, -daysDiff);
-    const prevEndDate = this.addDays(startDate, -1);
-
-    this.dashboardService.getSubmissionsPerDay(
-      this.formatDate(prevStartDate),
-      this.formatDate(prevEndDate)
-    ).subscribe(prevData => {
-      const prevSum = prevData.reduce((sum, d) => sum + d.count, 0);
-      const trend = this.calculateTrend(currentSum, prevSum);
-      this.trends.submissions = {
-        value: trend.value,
-        direction: trend.direction,
-        label: trend.label
-      };
-      this.cdr.detectChanges();
-    });
+  const current = this.stats.totalSubmissions;
+  const previous = this.priorStats.totalSubmissions;
+  if (previous === 0) {
+    this.trends.submissions = { value: 0, direction: 'steady', label: '0%' };
+    return;
   }
+  const diff = current - previous;
+  const percent = (diff / previous) * 100;
+  const direction = diff > 0 ? 'up' : diff < 0 ? 'down' : 'steady';
+  const sign = diff > 0 ? '+' : (diff < 0 ? '-' : '');
+  const rounded = Math.abs(Math.round(percent * 100) / 100);
+  this.trends.submissions = {
+    value: rounded,
+    direction,
+    label: `${sign}${rounded}%`
+  };
+}
 
   calculateTrend(current: number, previous: number) {
-    if (previous === 0) return { value: 100, direction: 'up', label: '+100%' };
+    if (previous === 0)     return { value: 0, direction: 'steady', label: '0%' };
     const diff = current - previous;
     const percent = (diff / previous) * 100;
     const direction = diff > 0 ? 'up' : diff < 0 ? 'down' : 'steady';
     const sign = diff > 0 ? '+' : (diff < 0 ? '-' : '');
-    const rounded = Math.abs(Math.round(percent));
+    const rounded = Math.abs(Math.round(percent * 100) / 100);
     return {
       value: rounded,
       direction,
@@ -271,7 +266,17 @@ calculateSessionTrend(): void {
   }
   
   applyRealtimeUpdate(data: any): void {
-    if (data.stats) this.stats = { ...this.stats, ...data.stats };
+    if (data.stats) 
+      {
+        this.priorStats = { ...this.stats };
+        this.stats = { ...this.stats, ...data.stats };
+         this.calculateEnqueteurTrend();
+         this.calculateSurveyTrend();
+       this.calculateSessionTrend();
+        this.calculateSubmissionTrend();
+            localStorage.setItem('dashboardPriorStats', JSON.stringify(this.stats));
+
+  }
     if (data.dailySubmissions) {
       this.dailySubmissions = data.dailySubmissions;
       this.updateBarChart(this.dailySubmissions);
@@ -295,13 +300,39 @@ calculateSessionTrend(): void {
   }
 
   
-  // ==================== CHARGEMENT DONNÉES ====================
+  // ==================== refraich====================
   loadAllData(): void {
+
+//if ( this.stats.totalEnqueteurs !== 0) {
+const savedPrior = localStorage.getItem('dashboardPriorStats');
+  if (savedPrior) {
+    this.priorStats = JSON.parse(savedPrior);
+    console.log('📊 priorStats restauré depuis localStorage =', this.priorStats);
+  } else {
+    // Première visite : on garde les zéros
+    this.priorStats = { totalEnqueteurs: 0, totalSurveys: 0, totalSessions: 0, totalSubmissions: 0 };
+  }
+  console.log('📊 AVANT appel API : stats =', this.stats, 'priorStats =', this.priorStats);
+
+    
+ // }
     this.dashboardService.getStats().subscribe(data => {
+                      console.log('📊 NOUVELLES stats reçues =', data);
+
             this.stats = data;
+    console.log('📊 après mise à jour : stats =', this.stats, 'priorStats =', this.priorStats);
+
+   //          if (this.priorStats.totalEnqueteurs === 0 && this.stats.totalEnqueteurs !== 0) {
+    //  this.priorStats = { ...this.stats };
+    //}
             this.calculateEnqueteurTrend();
             this.calculateSurveyTrend();
             this.calculateSessionTrend();
+            this.calculateSubmissionTrend();
+
+    localStorage.setItem('dashboardPriorStats', JSON.stringify(this.stats));
+    console.log('📊 priorStats sauvegardé =', this.stats);
+
             this.cdr.detectChanges();
         });
     this.loadSubmissionsPerDay();
@@ -364,7 +395,7 @@ calculateSessionTrend(): void {
       this.dailySubmissions = data;
       this.updateBarChart(data);
       this.drawBarChart(); 
-      this.calculateSubmissionTrend();
+      //this.calculateSubmissionTrend();
       this.cdr.detectChanges();
     });
   }
